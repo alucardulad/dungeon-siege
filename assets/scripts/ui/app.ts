@@ -125,6 +125,9 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   const save = loadSave(storageKey)
   const audio: SoundPlayer = options.audio ?? new WebAudioPlayer()
   let muted = doc.defaultView?.localStorage?.getItem(muteKey) === '1'
+  /** 上一次写进 DOM 的状态签名：值没变就不碰 DOM，减少主线程卡顿（卡顿会拖慢音效排期） */
+  let statsSignature = ''
+  let logsSignature = ''
 
   let currentIndex = 0
   let currentChapterId = LEVELS[0].chapter
@@ -300,6 +303,8 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
 
   async function runCode(): Promise<void> {
     if (running || disposed) return
+    // 切到后台再回来时浏览器会挂起音频，这里先唤醒，避免第一批音效迟到
+    webAudio.unlock?.()
     save.code[currentLevel().id] = editor.value
     persist()
     clearConsole()
@@ -436,10 +441,16 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   function clearConsole(): void {
     consoleEl.innerHTML = ''
     logElements = new Map()
+    logsSignature = ''
   }
 
   function drainLogs(): void {
     if (game.logs.length === 0 && logElements.size > 0) clearConsole()
+    const last = game.logs[game.logs.length - 1]
+    const signature = `${game.logs.length}|${last?.id ?? -1}|${last?.text ?? ''}`
+    if (signature === logsSignature) return
+    logsSignature = signature
+
     for (const entry of game.logs) {
       const existing = logElements.get(entry.id)
       if (!existing) {
@@ -461,6 +472,10 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
 
   function updateStats(): void {
     const hero = game.world.hero
+    const signature = `${Math.max(0, hero.hp)}|${hero.maxHp}|${game.world.gems}|${game.world.actions}|${game.world.kills}`
+    if (signature === statsSignature) return
+    statsSignature = signature
+
     const hpRatio = Math.max(0, hero.hp) / hero.maxHp
     statsEl.innerHTML = `
       <div class="ds-stat"><span>生命</span><b>${Math.max(0, hero.hp)} / ${hero.maxHp}</b></div>
@@ -506,7 +521,9 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     muted = next
     audio.setMuted?.(next)
     muteButton.textContent = next ? '🔇' : '🔊'
-    muteButton.title = next ? '音效已关闭' : '音效已开启'
+    const info = webAudio.latencyInfo?.()
+    const detail = info && info.state !== 'uninitialized' ? `（输出延迟约 ${info.outputLatency.toFixed(0)}ms）` : ''
+    muteButton.title = next ? '音效已关闭' : `音效已开启${detail}`
     try {
       doc.defaultView?.localStorage?.setItem(muteKey, next ? '1' : '0')
     } catch {
@@ -519,7 +536,10 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     if (!muted) audio.play('gem')
   })
 
-  const unlockAudio = () => webAudio.unlock?.()
+  const unlockAudio = () => {
+    webAudio.unlock?.()
+    applyMute(muted) // 解锁后把测到的延迟写进按钮提示
+  }
   doc.defaultView?.addEventListener('pointerdown', unlockAudio, { once: true })
   doc.defaultView?.addEventListener('keydown', unlockAudio, { once: true })
   applyMute(muted)

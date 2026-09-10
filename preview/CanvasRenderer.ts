@@ -9,6 +9,9 @@ export class Canvas2DView implements Painter {
   private canvas: HTMLCanvasElement
   private host: HTMLElement
   private scale = 1
+  /** 缓存容器尺寸：每帧读 clientWidth 会强制布局，卡主线程会连累音效 */
+  private hostWidth = 0
+  private hostHeight = 0
 
   constructor(canvas: HTMLCanvasElement, host: HTMLElement) {
     this.canvas = canvas
@@ -16,13 +19,24 @@ export class Canvas2DView implements Painter {
     const ctx = canvas.getContext('2d')
     if (!ctx) throw new Error('当前浏览器不支持 Canvas2D')
     this.ctx = ctx
+    this.measure()
+    if (typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(() => this.measure()).observe(host)
+    } else {
+      window.addEventListener('resize', () => this.measure())
+    }
+  }
+
+  private measure(): void {
+    this.hostWidth = this.host.clientWidth
+    this.hostHeight = this.host.clientHeight
   }
 
   /** 把整张地图等比缩放到容器里。 */
   private fit(frameWidth: number, frameHeight: number): void {
     const padding = 24
-    const availableWidth = Math.max(160, this.host.clientWidth - padding)
-    const availableHeight = Math.max(120, this.host.clientHeight - padding)
+    const availableWidth = Math.max(160, this.hostWidth - padding)
+    const availableHeight = Math.max(120, this.hostHeight - padding)
     this.scale = Math.max(0.2, Math.min(availableWidth / frameWidth, availableHeight / frameHeight, 1.8))
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2)

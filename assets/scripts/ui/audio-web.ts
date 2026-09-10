@@ -15,6 +15,7 @@ export class WebAudioPlayer implements SoundPlayer {
   private noiseBuffer: AudioBuffer | null = null
   private muted = false
   private volume: number
+  private unlocked = false
   /** 同一音效的最小间隔，避免连击时糊成一片 */
   private lastPlayed = new Map<SoundName, number>()
 
@@ -28,7 +29,36 @@ export class WebAudioPlayer implements SoundPlayer {
 
   /** 在第一次用户交互时调用，解锁浏览器的音频播放权限。 */
   unlock(): void {
-    this.ensure()
+    const context = this.ensure()
+    if (!context) return
+    if (context.state === 'suspended') void context.resume()
+    if (this.unlocked) return
+    this.unlocked = true
+    // 预热：播一个静音采样，让音频线程提前跑起来，
+    // 否则第一次真正发声时会有可感知的启动延迟。
+    const silent = context.createBufferSource()
+    silent.buffer = context.createBuffer(1, 1, context.sampleRate)
+    silent.connect(this.master as GainNode)
+    silent.start()
+    const info = this.latencyInfo()
+    console.log(
+      `[地牢围攻] 音频已解锁：状态 ${info.state}，输出延迟约 ${info.outputLatency.toFixed(1)}ms，基准延迟约 ${info.baseLatency.toFixed(1)}ms，采样率 ${info.sampleRate}Hz`,
+    )
+  }
+
+  /** 当前音频输出的真实延迟（毫秒），用来排查「音效有延迟」。 */
+  latencyInfo(): { state: string; baseLatency: number; outputLatency: number; sampleRate: number } {
+    const context = this.context
+    if (!context) return { state: 'uninitialized', baseLatency: 0, outputLatency: 0, sampleRate: 0 }
+    const extended = context as AudioContext & { outputLatency?: number }
+    const reportedOutput = (extended.outputLatency ?? 0) * 1000
+    return {
+      state: context.state,
+      baseLatency: (context.baseLatency ?? 0) * 1000,
+      // 有的浏览器把 outputLatency 报成 0，这时退回基准延迟，避免显示成 0ms 误导排查
+      outputLatency: reportedOutput > 0 ? reportedOutput : (context.baseLatency ?? 0) * 1000,
+      sampleRate: context.sampleRate,
+    }
   }
 
   setMuted(muted: boolean): void {
@@ -53,7 +83,9 @@ export class WebAudioPlayer implements SoundPlayer {
     const context = this.ensure()
     if (!context || !this.master) return
 
-    let start = context.currentTime + 0.005
+    // 上下文被挂起时先唤醒：否则音符会排在一条还没走动的时钟上，听起来就是慢半拍
+    if (context.state === 'suspended') void context.resume()
+    let start = context.currentTime + 0.002
     for (const note of spec.notes) {
       this.scheduleNote(context, note, start)
       start += note.duration + (spec.gap ?? 0)
@@ -75,7 +107,8 @@ export class WebAudioPlayer implements SoundPlayer {
     if (!Ctor) return null
 
     if (!this.context) {
-      this.context = new Ctor()
+      // interactive：让浏览器用尽量小的输出缓冲，延迟优先于省电
+      this.context = new Ctor({ latencyHint: 'interactive' })
       this.master = this.context.createGain()
       this.master.gain.value = this.volume
       this.master.connect(this.context.destination)
@@ -97,7 +130,8 @@ export class WebAudioPlayer implements SoundPlayer {
 
     const envelope = context.createGain()
     envelope.gain.setValueAtTime(0.0001, start)
-    envelope.gain.linearRampToValueAtTime(peak, start + 0.008)
+    // 起音要快：4ms 以内冲到峰值，听感上才「跟手」
+    envelope.gain.linearRampToValueAtTime(peak, start + 0.004)
     envelope.gain.exponentialRampToValueAtTime(0.0001, end)
 
     oscillator.connect(envelope)

@@ -8,7 +8,7 @@
 
 import { AudioClip, AudioSource, Node, resources } from 'cc'
 
-import { type SoundName, type SoundPlayer } from '../core/audio'
+import { SOUND_NAMES, type SoundName, type SoundPlayer } from '../core/audio'
 
 export interface CocosAudioOptions {
   /** 挂载 AudioSource 的父节点 */
@@ -34,6 +34,26 @@ export class CocosAudioPlayer implements SoundPlayer {
     this.source.playOnAwake = false
     this.folder = options.folder ?? 'audio'
     this.volume = options.volume ?? 0.7
+    this.preload()
+  }
+
+  /**
+   * 启动时一次性加载全部音效。
+   * 否则第一次响某个音效时它还在异步加载，会直接听不到——听起来就像「漏了一拍」。
+   */
+  private preload(): void {
+    const paths = SOUND_NAMES.map((name) => `${this.folder}/${name}`)
+    resources.load(paths, AudioClip, (error, assets) => {
+      if (error || !assets) {
+        console.warn(`[地牢围攻] 音效资源加载失败，可执行 npm run audio:wav 生成 assets/resources/${this.folder}/`)
+        return
+      }
+      const list = Array.isArray(assets) ? assets : [assets]
+      list.forEach((asset, index) => {
+        const name = SOUND_NAMES[index]
+        if (name && asset) this.clips.set(name, asset)
+      })
+    })
   }
 
   play(name: SoundName): void {
