@@ -10,6 +10,9 @@
     "dev": "node tools/dev-server.mjs",
     "test": "node --test --import ./tools/register-ts.mjs tests/*.test.ts",
     "scene": "node tools/make-scene.mjs",
+    "audio:midi": "node tools/make-midi.mjs",
+    "audio:wav": "node tools/make-wav.mjs",
+    "audio": "node tools/make-midi.mjs && node tools/make-wav.mjs",
     "check:cocos": "node --import ./tools/register-ts.mjs tools/check-cocos.mjs"
   },
   "private": true

@@ -13,6 +13,7 @@ export const UI_MARKUP = `
   <div class="ds-topbar-right">
     <span class="ds-progress" id="ds-progress"></span>
     <span class="ds-status" id="ds-status">准备就绪</span>
+    <button id="ds-mute" class="ds-mini" title="音效开关">🔊</button>
   </div>
 </header>
 <div class="ds-navbar">

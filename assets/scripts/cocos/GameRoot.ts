@@ -15,8 +15,11 @@
 import { _decorator, Camera, Canvas, Color, Component, Layers, Node, UITransform, Widget, director, view } from 'cc'
 
 import type { Frame } from '../core/render'
+import type { SoundPlayer } from '../core/audio'
 import { mountGameUI, type GameUIHandle } from '../ui/app'
+import { WebAudioPlayer } from '../ui/audio-web'
 import { CocosPainter } from './CocosPainter'
+import { CocosAudioPlayer } from './CocosAudioPlayer'
 
 const { ccclass, property } = _decorator
 
@@ -46,10 +49,20 @@ export class GameRoot extends Component {
       this.ui = mountGameUI({
         container: document.body,
         driveFrames: false, // 帧由 Cocos 的 update 驱动，避免两套时钟打架
+        audio: this.createAudioPlayer(),
       })
     } else {
       console.warn('[地牢围攻] 当前平台没有 DOM，代码编辑器需要自行接入；核心逻辑与画面仍然可用。')
     }
+  }
+
+  /** Web 用合成器（零素材），原生平台用 resources 里的 wav 文件。 */
+  private createAudioPlayer(): SoundPlayer {
+    const player = new WebAudioPlayer()
+    if (player.supported && typeof window !== 'undefined' && window.AudioContext) {
+      return player
+    }
+    return new CocosAudioPlayer({ parent: this.node })
   }
 
   update(dt: number): void {

@@ -19,6 +19,8 @@ import {
   type LevelDef,
   type RunResult,
 } from '../core/index'
+import type { SoundPlayer } from '../core/audio'
+import { WebAudioPlayer } from './audio-web'
 import { CodeEditor } from './editor'
 import { UI_MARKUP } from './markup'
 import { UI_STYLES } from './styles'
@@ -42,6 +44,8 @@ export interface GameUIOptions {
   storageKey?: string
   /** 切换到新关卡时通知外部（例如让 Cocos 重新绑定 Game） */
   onLevelChange?: (level: LevelDef, game: Game) => void
+  /** 音效播放器；不传就自动建一个 Web 合成器（原生平台可传 file 版实现） */
+  audio?: SoundPlayer
 }
 
 export interface GameUIHandle {
@@ -76,6 +80,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   const doc = options.container?.ownerDocument ?? document
   const levels = options.levels ?? LEVELS
   const storageKey = options.storageKey ?? 'dungeon-siege:v1'
+  const muteKey = `${storageKey}:muted`
   const driveFrames = options.driveFrames ?? true
 
   injectStyles(doc)
@@ -118,9 +123,12 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   }
 
   const save = loadSave(storageKey)
+  const audio: SoundPlayer = options.audio ?? new WebAudioPlayer()
+  let muted = doc.defaultView?.localStorage?.getItem(muteKey) === '1'
+
   let currentIndex = 0
   let currentChapterId = LEVELS[0].chapter
-  let game = new Game(levels[currentIndex])
+  let game = new Game(levels[currentIndex], { audio })
   let running = false
   let logElements = new Map<number, HTMLElement>()
   let scrollConsole = false
@@ -263,7 +271,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     save.code[currentLevel().id] = editor.value
     currentIndex = index
     currentChapterId = levels[currentIndex].chapter
-    game = new Game(currentLevel())
+    game = new Game(currentLevel(), { audio })
     editor.value = save.code[currentLevel().id] ?? currentLevel().starter
     editor.setErrorLine(null)
     clearConsole()
@@ -400,6 +408,11 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     overlayEl.classList.add('hidden')
   }
 
+  // 点弹窗外面也能关掉，不用非得点按钮
+  overlayEl.addEventListener('click', (event) => {
+    if (event.target === overlayEl) hideOverlay()
+  })
+
   dialogEl.addEventListener('click', (event) => {
     const target = event.target as HTMLElement
     const action = target.dataset.action
@@ -484,6 +497,32 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   resetButton.addEventListener('click', resetGame)
   answerButton.addEventListener('click', showAnswer)
   $<HTMLButtonElement>('ds-clear-console').addEventListener('click', clearConsole)
+
+  // 音效：第一次交互解锁浏览器音频，右上角可以随时静音
+  const muteButton = $<HTMLButtonElement>('ds-mute')
+  const webAudio = audio as WebAudioPlayer
+
+  function applyMute(next: boolean): void {
+    muted = next
+    audio.setMuted?.(next)
+    muteButton.textContent = next ? '🔇' : '🔊'
+    muteButton.title = next ? '音效已关闭' : '音效已开启'
+    try {
+      doc.defaultView?.localStorage?.setItem(muteKey, next ? '1' : '0')
+    } catch {
+      // 隐私模式忽略
+    }
+  }
+
+  muteButton.addEventListener('click', () => {
+    applyMute(!muted)
+    if (!muted) audio.play('gem')
+  })
+
+  const unlockAudio = () => webAudio.unlock?.()
+  doc.defaultView?.addEventListener('pointerdown', unlockAudio, { once: true })
+  doc.defaultView?.addEventListener('keydown', unlockAudio, { once: true })
+  applyMute(muted)
 
   updateBriefing()
   buildChapters()

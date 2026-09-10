@@ -64,6 +64,23 @@ npm run check:cocos # 提交前自检：场景引用、脚本 uuid、关卡地�
 `break/continue`、数组/对象字面量、三目运算符、`Math`、`console.log`。
 变量名和函数名可以用中文，例如 `function 前进并战斗() { ... }`。
 
+## 音效
+
+音效不依赖任何音频素材：`core/audio.ts` 把每个音效写成**音符序列**（音名 + 时值 + 波形），
+运行时用 Web Audio 的振荡器现场演奏，延迟低、体积为零。脚步、挥剑、命中、受伤、撞墙、踩尖刺、
+捡宝石、喝药水、击败敌人、通关、失败、报错各有自己的音色。右上角 🔊 可以静音（会记住设置）。
+
+想把音效拿到编曲软件里改，或者给 Cocos 原生平台用文件播放：
+
+```bash
+npm run audio        # 下面两种一起导出
+npm run audio:midi   # audio/midi/*.mid  —— 标准 MIDI 文件，可在 DAW 里编辑
+npm run audio:wav    # assets/resources/audio/*.wav —— 给 Cocos 原生平台播放
+```
+
+注意：`.mid` 只是乐谱，浏览器和 Cocos 都没有内置合成器，**不能直接播放**；
+所以运行时是现场合成同一份音符数据，导出的 MIDI/WAV 用于编辑、复用和原生平台。
+
 ## 课程与关卡（5 章 49 关）
 
 | 章节 | 关卡 | 教学目标 | 语法开关 |
@@ -84,9 +101,12 @@ npm run check:cocos # 提交前自检：场景引用、脚本 uuid、关卡地�
 
 ```
 assets/scripts/core/     引擎无关的核心：词法/语法/解释器、教学语法锁、世界规则、49 关数据、动画与帧
+assets/scripts/core/audio.ts  音效库：每个音效就是一段音符序列
 assets/scripts/ui/       界面层（DOM）：代码编辑器、关卡面板、控制台、结算弹窗
 assets/scripts/cocos/    Cocos 层：Graphics 画笔、GameRoot 入口组件
 assets/scenes/           Cocos 场景（由 tools/make-scene.mjs 生成）
+assets/resources/audio/  Cocos 原生平台用的音效 wav（npm run audio:wav 生成）
+audio/midi/              导出的 MIDI 文件，可在 DAW 里编辑音效
 preview/                 浏览器预览：入口 + Canvas2D 画笔
 tests/                   Node 原生测试（解释器 + 关卡通关 + 动画时序）
 tools/                   开发服务器、场景生成、自检脚本

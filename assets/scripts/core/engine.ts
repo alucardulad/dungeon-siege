@@ -6,6 +6,7 @@
  */
 
 import { createHeroApi } from './api'
+import type { SoundPlayer } from './audio'
 import type { Frame, FrameEffect } from './render'
 import { HaltSignal, ScriptError, type ScriptLocation } from './script/errors'
 import { Interpreter } from './script/interpreter'
@@ -23,6 +24,8 @@ export interface GameOptions {
   instant?: boolean
   maxSteps?: number
   onLog?: (entry: LogEntry) => void
+  /** 音效播放器；不传就是静音 */
+  audio?: SoundPlayer
 }
 
 export interface RunResult {
@@ -85,6 +88,7 @@ export class Game {
   private instant: boolean
   private maxSteps: number
   private onLog?: (entry: LogEntry) => void
+  private audio: SoundPlayer | null
   private views = new Map<string, View>()
   private effects: EffectState[] = []
   private bubbles: BubbleState[] = []
@@ -101,6 +105,7 @@ export class Game {
     this.instant = options.instant ?? false
     this.maxSteps = options.maxSteps ?? 20000
     this.onLog = options.onLog
+    this.audio = options.audio ?? null
     this.world = createWorld(level)
     this.reset()
   }
@@ -165,6 +170,7 @@ export class Game {
       } catch (error) {
         this.error = error instanceof ScriptError ? error : new ScriptError(String(error))
         this.status = 'ready'
+        this.audio?.play('error')
         this.log('error', `第 ${this.error.location.line} 行：${this.error.message}`)
         return this.result(0)
       }
@@ -179,6 +185,7 @@ export class Game {
           'locked',
         )
         this.status = 'ready'
+        this.audio?.play('error')
         this.log('error', `第 ${violation.line} 行：${this.error.message}`)
         return this.result(0)
       }
@@ -206,6 +213,7 @@ export class Game {
         } else if (error instanceof ScriptError) {
           this.error = error
           this.status = this.world.status === 'playing' ? 'ready' : this.world.status
+          this.audio?.play('error')
           this.log('error', `第 ${error.location.line} 行：${error.message}`)
         } else {
           throw error
@@ -293,12 +301,14 @@ export class Game {
   private finish(): void {
     if (this.world.status === 'win') {
       this.status = 'win'
+      this.audio?.play('win')
       this.log(
         'success',
         `任务完成！用了 ${this.world.actions} 次行动，${rateStars(this.world.actions, this.level.par)} 星评价`,
       )
     } else {
       this.status = 'lose'
+      this.audio?.play('lose')
       this.log('error', this.world.message)
     }
   }
@@ -328,6 +338,7 @@ export class Game {
           view.y = view.toY
           view.moving = false
         }
+        if (event.unitId === 'hero') this.audio?.play('move')
         break
       }
       case 'attack': {
@@ -337,19 +348,24 @@ export class Game {
         if (targetView && !this.instant) targetView.hurt = TIMING.hurt * 1.4
         if (event.attackerId === 'hero') {
           this.spawnEffect('slash', event.targetId, target)
+          this.audio?.play('swing')
+          this.audio?.play('hit')
           this.log('info', `英雄攻击${target ? nameOf(target) : '敌人'}，造成 ${event.damage} 点伤害`)
         } else if (attacker && target) {
           this.spawnEffect('hit', event.targetId, target)
+          this.audio?.play('hurt')
           this.log('warn', `${nameOf(attacker)}攻击英雄，英雄受到 ${event.damage} 点伤害`)
         }
         break
       }
       case 'blocked':
+        this.audio?.play('blocked')
         this.log('warn', event.message)
         break
       case 'spike': {
         this.spawnEffect('hit', event.unitId, this.world.hero)
         this.spawnFloat(`-${event.damage}`, this.world.hero, '#ff8f6b')
+        this.audio?.play('spike')
         this.log('warn', `踩到尖刺，掉了 ${event.damage} 点血`)
         break
       }
@@ -362,6 +378,7 @@ export class Game {
           this.effects.push({ kind: 'sparkle', x: cx, y: cy, t: 0, elapsed: 0, duration: TIMING.effect })
         }
         if (event.item.type === 'gem') {
+          this.audio?.play('gem')
           if (!this.instant) {
             this.effects.push({
               kind: 'float',
@@ -376,6 +393,7 @@ export class Game {
           }
           this.log('success', `捡到宝石，共 ${this.world.gems} 颗`)
         } else {
+          this.audio?.play('potion')
           if (!this.instant) {
             this.effects.push({ kind: 'heal', x: cx, y: cy, t: 0, elapsed: 0, duration: TIMING.effect })
             this.effects.push({
@@ -403,7 +421,10 @@ export class Game {
           view.dying = 0
         }
         const unit = this.world.units.find((item) => item.id === event.unitId)
-        if (unit && unit.type !== 'hero') this.log('success', `击败了${nameOf(unit)}`)
+        if (unit && unit.type !== 'hero') {
+          this.audio?.play('kill')
+          this.log('success', `击败了${nameOf(unit)}`)
+        }
         break
       }
     }
