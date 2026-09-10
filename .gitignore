@@ -1,0 +1,13 @@
+# Cocos Creator 生成的目录
+library/
+temp/
+local/
+build/
+profiles/
+native/
+.creator/
+
+# 依赖与系统文件
+node_modules/
+.DS_Store
+*.log

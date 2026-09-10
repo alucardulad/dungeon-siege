@@ -1,0 +1,16 @@
+{
+  "name": "dungeon-siege",
+  "uuid": "7c2a5f10-93b4-4d61-8f7a-2e5c4b910307",
+  "version": "3.8.4",
+  "creator": {
+    "version": "3.8.4"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "node tools/dev-server.mjs",
+    "test": "node --test --import ./tools/register-ts.mjs tests/*.test.ts",
+    "scene": "node tools/make-scene.mjs",
+    "check:cocos": "node tools/check-cocos.mjs"
+  },
+  "private": true
+}
