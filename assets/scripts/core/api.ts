@@ -8,7 +8,7 @@
 import type { Game } from './engine'
 import type { Item, Unit } from './types'
 import { ITEM_STATS, UNIT_STATS } from './types'
-import { distance, findUnit, livingEnemies, nearestEnemy, nearestItem } from './world'
+import { canHeroEnter, distance, findUnit, livingEnemies, lookFromHero, nearestEnemy, nearestItem } from './world'
 
 type ApiObject = Record<string, unknown>
 
@@ -84,6 +84,16 @@ export function createHeroApi(game: Game): Record<string, unknown> {
   define(hero, 'moveUp', () => () => game.moveHero(0, -1))
   define(hero, 'moveDown', () => () => game.moveHero(0, 1))
   define(hero, 'wait', () => () => game.waitHero())
+
+  // 观察与探路：让「检测前方有没有敌人 / 危险」这类关卡可以不靠硬编码
+  define(hero, 'canMoveRight', () => () => canHeroEnter(game.world, 1, 0))
+  define(hero, 'canMoveLeft', () => () => canHeroEnter(game.world, -1, 0))
+  define(hero, 'canMoveUp', () => () => canHeroEnter(game.world, 0, -1))
+  define(hero, 'canMoveDown', () => () => canHeroEnter(game.world, 0, 1))
+  define(hero, 'lookRight', () => () => lookFromHero(game.world, 1, 0))
+  define(hero, 'lookLeft', () => () => lookFromHero(game.world, -1, 0))
+  define(hero, 'lookUp', () => () => lookFromHero(game.world, 0, -1))
+  define(hero, 'lookDown', () => () => lookFromHero(game.world, 0, 1))
 
   define(hero, 'attack', () => (target: unknown) => {
     const unit = resolveUnit(game, target, 'hero.attack')

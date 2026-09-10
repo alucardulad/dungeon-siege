@@ -7,7 +7,18 @@
  *   - Cocos Creator：传 null，由 Cocos 自己的 update 驱动绘制
  */
 
-import { Game, LEVELS, type Frame, type LevelDef, type RunResult } from '../core/index'
+import {
+  CHAPTERS,
+  FEATURE_LABEL,
+  Game,
+  LEVELS,
+  findChapter,
+  levelsOfChapter,
+  type Frame,
+  type LanguageFeature,
+  type LevelDef,
+  type RunResult,
+} from '../core/index'
 import { CodeEditor } from './editor'
 import { UI_MARKUP } from './markup'
 import { UI_STYLES } from './styles'
@@ -78,9 +89,12 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   const $ = <T extends HTMLElement>(id: string): T => app.querySelector(`#${id}`) as T
 
   const levelListEl = $<HTMLElement>('ds-level-list')
+  const chaptersEl = $<HTMLElement>('ds-chapters')
+  const progressEl = $<HTMLElement>('ds-progress')
   const levelNameEl = $<HTMLElement>('ds-level-name')
   const levelSubtitleEl = $<HTMLElement>('ds-level-subtitle')
   const objectiveEl = $<HTMLElement>('ds-objective')
+  const syntaxEl = $<HTMLElement>('ds-syntax')
   const commandsEl = $<HTMLElement>('ds-commands')
   const hintsEl = $<HTMLElement>('ds-hints')
   const statsEl = $<HTMLElement>('ds-stats')
@@ -105,6 +119,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
 
   const save = loadSave(storageKey)
   let currentIndex = 0
+  let currentChapterId = LEVELS[0].chapter
   let game = new Game(levels[currentIndex])
   let running = false
   let logElements = new Map<number, HTMLElement>()
@@ -145,9 +160,47 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
 
   // ------------------------------------------------------------ 关卡与状态
 
+  function buildChapters(): void {
+    chaptersEl.innerHTML = ''
+    for (const chapter of CHAPTERS) {
+      const button = doc.createElement('button')
+      button.className = 'ds-chapter-chip'
+      button.type = 'button'
+      button.textContent = chapter.name.replace(/^第 (\d+) 章 · /, '$1 · ')
+      button.title = `${chapter.subtitle}\n${chapter.goal}`
+      button.addEventListener('click', () => jumpToChapter(chapter.id))
+      chaptersEl.appendChild(button)
+    }
+    highlightChapter()
+  }
+
+  function highlightChapter(): void {
+    Array.from(chaptersEl.children).forEach((child, index) => {
+      child.classList.toggle('is-active', CHAPTERS[index].id === currentChapterId)
+    })
+  }
+
+  /** 切到某一章：优先落在这一章里最近玩过的关卡，否则落到第一关。 */
+  function jumpToChapter(chapterId: string): void {
+    const chapterLevels = levelsOfChapter(chapterId)
+    if (chapterLevels.length === 0) return
+    const played = chapterLevels.filter((level) => save.code[level.id] !== undefined)
+    const target = played.length > 0 ? played[played.length - 1] : chapterLevels[0]
+    const index = levels.indexOf(target)
+    if (index === currentIndex) {
+      currentChapterId = chapterId
+      highlightChapter()
+      buildLevelList()
+      return
+    }
+    selectLevel(index)
+  }
+
   function buildLevelList(): void {
     levelListEl.innerHTML = ''
-    levels.forEach((level, index) => {
+    const chapterLevels = levelsOfChapter(currentChapterId)
+    for (const level of chapterLevels) {
+      const index = levels.indexOf(level)
       const chip = doc.createElement('button')
       chip.className = 'ds-level-chip'
       chip.type = 'button'
@@ -156,8 +209,16 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
       chip.title = level.name
       chip.addEventListener('click', () => selectLevel(index))
       levelListEl.appendChild(chip)
-    })
+    }
     highlightChip()
+    highlightChapter()
+    updateProgress()
+  }
+
+  function updateProgress(): void {
+    const cleared = levels.filter((level) => (save.progress[level.id]?.stars ?? 0) > 0).length
+    const stars = levels.reduce((total, level) => total + (save.progress[level.id]?.stars ?? 0), 0)
+    progressEl.textContent = `通关 ${cleared}/${levels.length} · ★ ${stars}/${levels.length * 3}`
   }
 
   function highlightChip(): void {
@@ -168,9 +229,15 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
 
   function updateBriefing(): void {
     const level = currentLevel()
+    const chapter = findChapter(level.chapter)
     levelNameEl.textContent = level.name
-    levelSubtitleEl.textContent = `${level.subtitle} · 三星线 ${level.par} 次行动`
+    levelSubtitleEl.textContent = `${chapter?.name ?? ''} · ${level.subtitle} · 三星线 ${level.par} 次行动`
     objectiveEl.textContent = level.objective
+
+    const locks = ((level.forbidden ?? []) as LanguageFeature[]).map((feature) => FEATURE_LABEL[feature])
+    syntaxEl.innerHTML = locks.length
+      ? `本章可用：${chapter?.allow.join(' / ') ?? ''}<br /><span class="ds-lock">还不能用：${locks.join(' / ')}</span>`
+      : `本章可用：全部语法（含自定义函数）`
 
     commandsEl.innerHTML = ''
     for (const command of level.newCommands ?? []) {
@@ -195,13 +262,14 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     if (running) stopCode()
     save.code[currentLevel().id] = editor.value
     currentIndex = index
+    currentChapterId = levels[currentIndex].chapter
     game = new Game(currentLevel())
     editor.value = save.code[currentLevel().id] ?? currentLevel().starter
     editor.setErrorLine(null)
     clearConsole()
     hideOverlay()
     updateBriefing()
-    highlightChip()
+    buildLevelList()
     setStatus('准备就绪')
     updateStats()
     options.onLevelChange?.(currentLevel(), game)
@@ -418,6 +486,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   $<HTMLButtonElement>('ds-clear-console').addEventListener('click', clearConsole)
 
   updateBriefing()
+  buildChapters()
   buildLevelList()
   updateStats()
   setRunning(false)

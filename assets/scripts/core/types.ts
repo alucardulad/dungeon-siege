@@ -6,6 +6,22 @@ export type UnitType = 'hero' | 'munchkin' | 'ogre' | 'ogre-chief'
 
 export type ItemType = 'gem' | 'potion'
 
+/** 会随教学进度逐步解锁的语法特性。 */
+export type LanguageFeature = 'for' | 'while' | 'if' | 'function'
+
+/** 难度分段（章节）。 */
+export interface ChapterDef {
+  id: string
+  name: string
+  subtitle: string
+  /** 本章要掌握的技能 */
+  goal: string
+  /** 本章允许使用的语法（界面展示用） */
+  allow: string[]
+  /** 本章禁止的语法 */
+  forbidden: LanguageFeature[]
+}
+
 export interface UnitStats {
   name: string
   hp: number
@@ -35,6 +51,8 @@ export interface WinCondition {
 
 export interface LevelDef {
   id: string
+  /** 属于哪一章（见 CHAPTERS） */
+  chapter: string
   name: string
   subtitle: string
   /** 关卡目标，显示在任务面板 */
@@ -43,6 +61,8 @@ export interface LevelDef {
   hints: string[]
   /** 本关首次出现的指令，用于教学提示 */
   newCommands?: string[]
+  /** 本章还不允许使用的语法；违反时给出友好提示 */
+  forbidden?: LanguageFeature[]
   /** 三星所需的行动次数 */
   par: number
   /** ASCII 地图，见 world.ts 的图例 */

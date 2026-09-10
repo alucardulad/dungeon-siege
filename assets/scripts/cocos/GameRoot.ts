@@ -20,9 +20,9 @@ import { CocosPainter } from './CocosPainter'
 
 const { ccclass, property } = _decorator
 
-/** 与 ui/styles.ts 里的顶栏、底部按钮条高度保持一致，用于让画面居中 */
-const TOP_BAR_HEIGHT = 54
-const BOTTOM_BAR_HEIGHT = 56
+/** 与 ui/styles.ts 里的两行导航栏、底部按钮条高度保持一致，用于让画面居中 */
+const TOP_BAR_HEIGHT = 96
+const BOTTOM_BAR_HEIGHT = 80
 
 @ccclass('GameRoot')
 export class GameRoot extends Component {

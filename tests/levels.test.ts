@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import { Game } from '../assets/scripts/core/engine'
-import { LEVELS, findLevel } from '../assets/scripts/core/levels'
+import { CHAPTERS, LEVELS, findLevel, levelsOfChapter } from '../assets/scripts/core/levels'
 import { rateStars } from '../assets/scripts/core/world'
 import type { LevelDef } from '../assets/scripts/core/types'
 
@@ -103,4 +103,52 @@ test('星级评价：行动越少星越多', () => {
   assert.equal(rateStars(9, 9), 3)
   assert.equal(rateStars(12, 9), 2)
   assert.equal(rateStars(20, 9), 1)
+})
+
+test('课程结构：5 章共 49 关，每章关数固定', () => {
+  assert.equal(CHAPTERS.length, 5)
+  assert.equal(LEVELS.length, 49)
+  const expected = [10, 12, 12, 10, 5]
+  CHAPTERS.forEach((chapter, index) => {
+    assert.equal(levelsOfChapter(chapter.id).length, expected[index], `${chapter.name} 关数不对`)
+  })
+})
+
+test('每关都归到了正确的章节，且语法锁与章节一致', () => {
+  for (const level of LEVELS) {
+    const chapter = CHAPTERS.find((item) => item.id === level.chapter)
+    assert.ok(chapter, `${level.id} 的章节 ${level.chapter} 不存在`)
+    assert.deepEqual(level.forbidden, chapter?.forbidden, `${level.id} 的语法锁与章节不一致`)
+  }
+})
+
+test('第 1 章不许循环和判断，提示要说清楚原因', async () => {
+  const level = findLevel('level-1')
+  assert.ok(level)
+  const { result } = await play(level, 'while (true) { hero.moveRight() }')
+  assert.equal(result.error?.code, 'locked')
+  assert.match(result.error?.message ?? '', /while/)
+})
+
+test('第 2 章可以用 for，但不许用 if', async () => {
+  const level = findLevel('level-11')
+  assert.ok(level)
+  const ok = await play(level, level.solution)
+  assert.equal(ok.result.status, 'win')
+
+  const locked = await play(level, 'for (let i = 0; i < 3; i++) { if (true) { hero.moveRight() } }')
+  assert.equal(locked.result.error?.code, 'locked')
+  assert.match(locked.result.error?.message ?? '', /if/)
+})
+
+test('第 4 章可以用 while；第 5 章才允许自定义函数', async () => {
+  const ch4 = findLevel('level-35')
+  const ch5 = findLevel('level-49')
+  assert.ok(ch4 && ch5)
+
+  const ch4Function = await play(ch4, 'function 走() { hero.moveRight() }\n走()')
+  assert.equal(ch4Function.result.error?.code, 'locked')
+
+  const ch5Function = await play(ch5, 'function 打() {\n  const 敌人 = hero.findNearestEnemy()\n  if (敌人 && hero.distanceTo(敌人) <= 1) { hero.attack(敌人) }\n}\nwhile (true) {\n  打()\n  if (hero.canMoveRight()) { hero.moveRight() } else { break }\n}')
+  assert.equal(ch5Function.result.error, null)
 })

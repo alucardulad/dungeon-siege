@@ -10,7 +10,7 @@
 
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, relative, resolve, sep } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)))
 const problems = []
@@ -89,23 +89,46 @@ else {
 
 // ------------------------------------------------------------ 3. 关卡数据
 
-const levelsSource = readFileSync(resolve(root, 'assets/scripts/core/levels.ts'), 'utf8')
-const mapBlocks = [...levelsSource.matchAll(/map:\s*\[([\s\S]*?)\]/g)].map((match) =>
-  [...match[1].matchAll(/'([^']*)'/g)].map((row) => row[1]),
-)
-if (mapBlocks.length === 0) problems.push('没有在 levels.ts 里找到关卡地图')
-mapBlocks.forEach((rows, index) => {
-  const width = rows[0]?.length ?? 0
-  rows.forEach((row, rowIndex) => {
-    if (row.length !== width) {
-      problems.push(`第 ${index + 1} 关第 ${rowIndex + 1} 行宽度 ${row.length} 与第一行 ${width} 不一致`)
+// 直接导入真实的关卡数据来校验，比正则扫源码靠谱
+const { LEVELS, CHAPTERS } = await import(pathToFileURL(resolve(root, 'assets/scripts/core/levels.ts')).href)
+
+if (!Array.isArray(LEVELS) || LEVELS.length === 0) {
+  problems.push('levels.ts 没有导出关卡数组')
+} else {
+  const ids = new Set()
+  const counts = new Map()
+
+  for (const level of LEVELS) {
+    if (ids.has(level.id)) problems.push(`关卡 id 重复：${level.id}`)
+    ids.add(level.id)
+
+    const chapter = CHAPTERS.find((item) => item.id === level.chapter)
+    if (!chapter) problems.push(`${level.id} 引用了不存在的章节 ${level.chapter}`)
+    counts.set(level.chapter, (counts.get(level.chapter) ?? 0) + 1)
+
+    const rows = level.map
+    const width = rows[0]?.length ?? 0
+    rows.forEach((row, rowIndex) => {
+      if (row.length !== width) {
+        problems.push(`${level.id} 第 ${rowIndex + 1} 行宽度 ${row.length}，与第一行 ${width} 不一致`)
+      }
+    })
+
+    const joined = rows.join('')
+    const heroes = (joined.match(/@/g) ?? []).length
+    if (heroes !== 1) problems.push(`${level.id} 应该有 1 个英雄出生点 @，实际 ${heroes} 个`)
+    if (level.win?.reachExit && !joined.includes('E')) {
+      problems.push(`${level.id} 的胜利条件要求到达出口，但地图里没有 E`)
     }
-  })
-  const joined = rows.join('')
-  const heroes = (joined.match(/@/g) ?? []).length
-  if (heroes !== 1) problems.push(`第 ${index + 1} 关应该有 1 个英雄出生点 @，实际 ${heroes} 个`)
-})
-notes.push(`关卡数量：${mapBlocks.length}`)
+    if (!level.solution?.trim()) problems.push(`${level.id} 缺少参考解`)
+    if (!(level.par > 0)) problems.push(`${level.id} 的三星线不合法：${level.par}`)
+  }
+
+  notes.push(`关卡数量：${LEVELS.length} 关，分 ${CHAPTERS.length} 章`)
+  for (const chapter of CHAPTERS) {
+    notes.push(`  ${chapter.name}（${chapter.subtitle}）：${counts.get(chapter.id) ?? 0} 关`)
+  }
+}
 
 // ------------------------------------------------------------ 4. 工程配置
 

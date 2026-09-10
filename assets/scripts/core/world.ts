@@ -141,6 +141,27 @@ export function distance(a: { x: number; y: number }, b: { x: number; y: number 
   return Math.abs(a.x - b.x) + Math.abs(a.y - b.y)
 }
 
+/** 英雄前方那一格能不能走（界内、不是墙、也没有单位站着）。 */
+export function canHeroEnter(world: WorldState, dx: number, dy: number): boolean {
+  const x = world.hero.x + dx
+  const y = world.hero.y + dy
+  if (!isWalkable(world, x, y)) return false
+  return unitAt(world, x, y) === null
+}
+
+/** 英雄前方那一格有什么，返回中文词，供教学关卡的「观察」指令使用。 */
+export function lookFromHero(world: WorldState, dx: number, dy: number): string {
+  const x = world.hero.x + dx
+  const y = world.hero.y + dy
+  const tile = tileAt(world, x, y)
+  if (tile === null || tile === 'wall') return '墙'
+  if (unitAt(world, x, y)) return '敌人'
+  if (itemAt(world, x, y)) return '物品'
+  if (tile === 'spike') return '尖刺'
+  if (tile === 'exit') return '出口'
+  return '空地'
+}
+
 export function nearestEnemy(world: WorldState): Unit | null {
   return sortByDistance(world.hero, livingEnemies(world))[0] ?? null
 }

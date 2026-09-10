@@ -10,15 +10,22 @@ export const UI_MARKUP = `
     <span class="ds-brand-name">地牢围攻</span>
     <span class="ds-brand-tag">CodeDungeon · 用代码指挥英雄</span>
   </div>
-  <nav class="ds-level-list" id="ds-level-list" aria-label="关卡"></nav>
-  <span class="ds-status" id="ds-status">准备就绪</span>
+  <div class="ds-topbar-right">
+    <span class="ds-progress" id="ds-progress"></span>
+    <span class="ds-status" id="ds-status">准备就绪</span>
+  </div>
 </header>
+<div class="ds-navbar">
+  <nav class="ds-chapters" id="ds-chapters" aria-label="章节"></nav>
+  <nav class="ds-level-list" id="ds-level-list" aria-label="关卡"></nav>
+</div>
 <aside class="ds-side">
   <section class="ds-panel ds-briefing">
     <h2 id="ds-level-name">第 1 关</h2>
     <p class="ds-subtitle" id="ds-level-subtitle"></p>
     <h3>任务目标</h3>
     <p id="ds-objective"></p>
+    <p class="ds-syntax" id="ds-syntax"></p>
     <h3>本关新指令</h3>
     <ul class="ds-command-list" id="ds-commands"></ul>
     <details id="ds-hint-box">

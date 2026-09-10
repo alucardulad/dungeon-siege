@@ -10,7 +10,7 @@
     "dev": "node tools/dev-server.mjs",
     "test": "node --test --import ./tools/register-ts.mjs tests/*.test.ts",
     "scene": "node tools/make-scene.mjs",
-    "check:cocos": "node tools/check-cocos.mjs"
+    "check:cocos": "node --import ./tools/register-ts.mjs tools/check-cocos.mjs"
   },
   "private": true
 }

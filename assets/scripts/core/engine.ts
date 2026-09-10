@@ -10,6 +10,7 @@ import type { Frame, FrameEffect } from './render'
 import { HaltSignal, ScriptError, type ScriptLocation } from './script/errors'
 import { Interpreter } from './script/interpreter'
 import { parseScript } from './script/parser'
+import { FEATURE_HINT, FEATURE_LABEL, findForbiddenFeature } from './tutor'
 import type { Item, LevelDef, LogEntry, Unit, WorldEvent, WorldState } from './types'
 import { ITEM_STATS } from './types'
 import { checkOutcome, createWorld, enemiesTurn, heroAttack, heroMove, heroWait, rateStars } from './world'
@@ -165,6 +166,20 @@ export class Game {
         this.error = error instanceof ScriptError ? error : new ScriptError(String(error))
         this.status = 'ready'
         this.log('error', `第 ${this.error.location.line} 行：${this.error.message}`)
+        return this.result(0)
+      }
+
+      // 教学进度控制：本章还没教的语法（比如第 1 章的 while）先不许用
+      const violation = findForbiddenFeature(program, this.level.forbidden ?? [])
+      if (violation) {
+        const feature = violation.feature
+        this.error = new ScriptError(
+          `这一章还不能用 ${FEATURE_LABEL[feature]}，${FEATURE_HINT[feature]}`,
+          { line: violation.line, column: violation.column },
+          'locked',
+        )
+        this.status = 'ready'
+        this.log('error', `第 ${violation.line} 行：${this.error.message}`)
         return this.result(0)
       }
 
