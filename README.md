@@ -1,6 +1,6 @@
 # 地牢围攻（CodeDungeon）
 
-> 🎮 普通玩家想直接玩？请直接[下载安装包并查看游戏介绍](游戏介绍.md)，无需安装任何开发环境。下面内容是开发者文档。
+> 🎮 普通玩家想直接玩？请直接[下载安装包并查看游戏介绍](https://gitee.com/alucardulad/dungeon-siege/blob/main/%E6%B8%B8%E6%88%8F%E4%BB%8B%E7%BB%8D.md)，无需安装任何开发环境。下面内容是开发者文档。
 
 一个 CodeCombat 风格的「用代码指挥英雄」闯关游戏，基于 **Cocos Creator 3.8 + TypeScript**。
 
@@ -43,7 +43,7 @@
 
 如果这个小工具帮到了你，可以扫码请我喝杯咖啡 ☕
 
-![打赏码](docs/images/donate-qr-card.png)
+![打赏码](https://gitee.com/alucardulad/dungeon-siege/raw/main/docs/images/donate-qr-card.png)
 
 （原海报保存在 `docs/images/donate-qr.png`；上面这张是它的裁剪版，去掉了四周空白，扫码更清楚。）
 
