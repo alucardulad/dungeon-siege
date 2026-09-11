@@ -24,6 +24,9 @@ export const UI_STYLES = `
   --ds-ui: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   --ds-side-width: 520px;
   --ds-teacher-width: 320px;
+  --ds-topbar-height: 56px;
+  /* 顶栏 + 章节栏的总高度，老师面板和舞台都按它让位 */
+  --ds-header-height: 102px;
 }
 
 .ds-app {
@@ -42,7 +45,7 @@ export const UI_STYLES = `
   inset: 0;
   padding-left: var(--ds-teacher-width);
   padding-right: var(--ds-side-width);
-  padding-top: 96px;
+  padding-top: var(--ds-header-height);
   padding-bottom: 80px;
   display: flex;
   align-items: center;
@@ -68,7 +71,7 @@ export const UI_STYLES = `
   top: 0;
   left: 0;
   right: var(--ds-side-width);
-  height: 50px;
+  height: var(--ds-topbar-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -86,7 +89,7 @@ export const UI_STYLES = `
 
 .ds-navbar {
   position: absolute;
-  top: 50px;
+  top: var(--ds-topbar-height);
   left: 0;
   right: var(--ds-side-width);
   height: 46px;
@@ -110,14 +113,23 @@ export const UI_STYLES = `
 .ds-chapter-chip:hover { border-color: #3b4762; color: var(--ds-text); }
 .ds-chapter-chip.is-active { background: rgba(58, 123, 253, 0.2); border-color: var(--ds-accent); color: var(--ds-text); }
 
-.ds-topbar-right { display: flex; align-items: baseline; gap: 12px; }
+.ds-topbar-right { display: flex; align-items: center; gap: 10px; }
 .ds-profile {
-  display: flex; align-items: center; gap: 6px;
-  font-family: var(--ds-ui); font-size: 13px; color: var(--ds-text);
-  background: transparent; border: 0; cursor: pointer; padding: 2px 6px;
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--ds-ui); font-size: 15px; font-weight: 600; color: var(--ds-text);
+  background: rgba(110, 168, 254, 0.16);
+  border: 1px solid rgba(110, 168, 254, 0.4);
+  border-radius: 999px; cursor: pointer; padding: 5px 15px 5px 5px;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
-.ds-profile:hover { color: var(--ds-accent); }
-.ds-progress { font-size: 11px; color: var(--ds-muted); white-space: nowrap; }
+.ds-profile:hover { background: rgba(110, 168, 254, 0.26); border-color: var(--ds-accent); }
+.ds-profile-avatar {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  font-size: 17px; line-height: 1;
+  background: #10151f; border: 1px solid var(--ds-line); flex: 0 0 auto;
+}
+.ds-progress { font-size: 12px; color: var(--ds-muted); white-space: nowrap; }
 
 .ds-level-chip {
   display: flex; flex-direction: column; align-items: center; gap: 1px;
@@ -147,7 +159,7 @@ export const UI_STYLES = `
 }
 
 .ds-teacher-panel {
-  position: absolute; left: 0; top: 96px; bottom: 0; width: var(--ds-teacher-width);
+  position: absolute; left: 0; top: var(--ds-header-height); bottom: 0; width: var(--ds-teacher-width);
   display: flex; flex-direction: column; align-items: center; gap: 10px;
   padding: 20px 16px; overflow-y: auto;
   background: linear-gradient(180deg, rgba(24, 31, 48, 0.92), rgba(13, 16, 23, 0.96));
@@ -303,18 +315,21 @@ export const UI_STYLES = `
 .ds-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .ds-btn.ds-primary { background: var(--ds-accent-strong); border-color: var(--ds-accent-strong); font-weight: 600; }
 .ds-btn.ds-primary:hover:not(:disabled) { background: #4f8bff; }
-.ds-mini { font-family: var(--ds-ui); font-size: 12px; color: var(--ds-text); background: var(--ds-panel-soft); border: 1px solid var(--ds-line); border-radius: 6px; padding: 3px 8px; cursor: pointer; }
-.ds-logout {
-  font-family: var(--ds-ui); font-size: 12px; color: var(--ds-muted);
-  background: transparent; border: 1px solid var(--ds-line); border-radius: 6px;
-  padding: 3px 9px; cursor: pointer;
+.ds-mini {
+  font-family: var(--ds-ui); font-size: 13px; color: var(--ds-text);
+  background: var(--ds-panel-soft); border: 1px solid #39425c; border-radius: 8px;
+  padding: 5px 9px; cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.ds-mini:hover { background: #263048; border-color: #4a5570; }
+.ds-logout,
+.ds-about-btn {
+  font-family: var(--ds-ui); font-size: 14px; font-weight: 600; color: var(--ds-text);
+  background: var(--ds-panel-soft); border: 1px solid #39425c; border-radius: 8px;
+  padding: 6px 15px; cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 .ds-logout:hover { color: var(--ds-error); border-color: var(--ds-error); }
-.ds-about-btn {
-  font-family: var(--ds-ui); font-size: 12px; color: var(--ds-muted);
-  background: transparent; border: 1px solid var(--ds-line); border-radius: 6px;
-  padding: 3px 9px; cursor: pointer;
-}
 .ds-about-btn:hover { color: var(--ds-accent); border-color: var(--ds-accent); }
 .ds-btn kbd { font-family: var(--ds-mono); font-size: 11px; background: rgba(255, 255, 255, 0.12); border-radius: 4px; padding: 1px 4px; }
 
@@ -428,15 +443,35 @@ export const UI_STYLES = `
   .ds-about-donate img { width: 104px; height: 104px; }
 }
 
+/* 顶栏宽度不够时逐级收缩，保证用户名 / 关于 / 退出始终看得见 */
+@media (max-width: 1440px) {
+  .ds-brand-tag { display: none; }
+}
+
+@media (max-width: 1240px) {
+  .ds-progress { display: none; }
+  .ds-topbar-right { gap: 8px; }
+}
+
+@media (max-width: 860px) {
+  /* 窗口很窄时优先保证用户名 / 关于 / 退出都在，品牌名让位给图标 */
+  .ds-brand-name { display: none; }
+}
+
 @media (max-width: 1080px) {
   :root { --ds-side-width: 0px; --ds-teacher-width: 0px; }
   .ds-topbar, .ds-navbar { right: 0; }
   .ds-teacher-panel { display: none; }
+  .ds-topbar-right { gap: 6px; }
+  .ds-profile { font-size: 14px; padding: 4px 10px 4px 4px; }
+  .ds-profile-avatar { width: 24px; height: 24px; font-size: 15px; }
+  .ds-logout, .ds-about-btn { font-size: 13px; padding: 5px 10px; }
+  .ds-mini { padding: 4px 7px; }
   .ds-side {
     top: auto; left: 0; right: 0; bottom: 0; width: auto; height: 58%;
     border-left: 0; border-top: 1px solid var(--ds-line);
   }
-  .ds-stage { padding-left: 0; padding-right: 0; padding-top: 96px; padding-bottom: 58%; }
+  .ds-stage { padding-left: 0; padding-right: 0; padding-top: var(--ds-header-height); padding-bottom: 58%; }
   .ds-controls { left: 0; right: 0; bottom: calc(58% + 12px); }
 }
 `
