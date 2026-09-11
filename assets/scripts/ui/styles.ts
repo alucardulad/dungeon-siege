@@ -304,6 +304,12 @@ export const UI_STYLES = `
 .ds-btn.ds-primary { background: var(--ds-accent-strong); border-color: var(--ds-accent-strong); font-weight: 600; }
 .ds-btn.ds-primary:hover:not(:disabled) { background: #4f8bff; }
 .ds-mini { font-family: var(--ds-ui); font-size: 12px; color: var(--ds-text); background: var(--ds-panel-soft); border: 1px solid var(--ds-line); border-radius: 6px; padding: 3px 8px; cursor: pointer; }
+.ds-logout {
+  font-family: var(--ds-ui); font-size: 12px; color: var(--ds-muted);
+  background: transparent; border: 1px solid var(--ds-line); border-radius: 6px;
+  padding: 3px 9px; cursor: pointer;
+}
+.ds-logout:hover { color: var(--ds-error); border-color: var(--ds-error); }
 .ds-btn kbd { font-family: var(--ds-mono); font-size: 11px; background: rgba(255, 255, 255, 0.12); border-radius: 4px; padding: 1px 4px; }
 
 .ds-overlay {

@@ -589,6 +589,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
 
   // 音效：第一次交互解锁浏览器音频，右上角可以随时静音
   const muteButton = $<HTMLButtonElement>('ds-mute')
+  const logoutButton = $<HTMLButtonElement>('ds-logout')
   const webAudio = audio as WebAudioPlayer
 
   function applyMute(next: boolean): void {
@@ -716,6 +717,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   }
 
   profileButton.addEventListener('click', openLogin)
+  logoutButton.addEventListener('click', logout)
   loginStartButton.addEventListener('click', closeLoginAndApply)
   loginNameEl.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') closeLoginAndApply()
@@ -726,6 +728,40 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     selectedGender = card.dataset.gender as 'male' | 'female'
     renderGenderPicker()
   })
+
+  function logout(): void {
+    if (running) {
+      game.stop()
+      setRunning(false)
+    }
+    // 清除本机保存的角色，回到登录界面（关卡进度与代码保留）
+    try {
+      doc.defaultView?.localStorage?.removeItem(profileKey)
+    } catch {
+      // 隐私模式忽略
+    }
+    profile = null
+    heroName = '英雄'
+    heroGender = 'male'
+    selectedGender = 'male'
+
+    currentIndex = 0
+    currentChapterId = levels[0].chapter
+    game = makeGame()
+    editor.value = save.code[levels[0].id] ?? levels[0].starter
+    editor.setErrorLine(null)
+    clearConsole()
+    hideOverlay()
+    updateBriefing()
+    buildChapters()
+    buildLevelList()
+    updateStats()
+    updateGreeting()
+    updateTeacher()
+    failCount = 0
+    setStatus('已退出登录')
+    openLogin()
+  }
 
   updateBriefing()
   buildChapters()

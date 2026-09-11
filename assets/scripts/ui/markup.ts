@@ -18,6 +18,7 @@ export const UI_MARKUP = `
     <span class="ds-progress" id="ds-progress"></span>
     <span class="ds-status" id="ds-status">准备就绪</span>
     <button id="ds-mute" class="ds-mini" title="音效开关">🔊</button>
+    <button id="ds-logout" class="ds-logout" title="退出登录">退出</button>
   </div>
 </header>
 <div class="ds-navbar">
