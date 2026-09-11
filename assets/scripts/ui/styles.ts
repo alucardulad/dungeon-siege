@@ -109,6 +109,12 @@ export const UI_STYLES = `
 .ds-chapter-chip.is-active { background: rgba(58, 123, 253, 0.2); border-color: var(--ds-accent); color: var(--ds-text); }
 
 .ds-topbar-right { display: flex; align-items: baseline; gap: 12px; }
+.ds-profile {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--ds-ui); font-size: 13px; color: var(--ds-text);
+  background: transparent; border: 0; cursor: pointer; padding: 2px 6px;
+}
+.ds-profile:hover { color: var(--ds-accent); }
 .ds-progress { font-size: 11px; color: var(--ds-muted); white-space: nowrap; }
 
 .ds-level-chip {
@@ -278,6 +284,42 @@ export const UI_STYLES = `
 .ds-dialog .ds-dialog-stars .on { color: var(--ds-gold); text-shadow: 0 0 12px rgba(255, 209, 102, 0.5); }
 .ds-dialog p { color: var(--ds-muted); font-size: 13px; line-height: 1.7; }
 .ds-dialog .ds-actions { display: flex; gap: 8px; justify-content: center; margin-top: 16px; }
+
+/* ---------------------------------------------------------------- 登录/选人 */
+
+.ds-login {
+  position: absolute; inset: 0; z-index: 40;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 50% 35%, #1d2434, #0b0e14 78%);
+}
+.ds-login.hidden { display: none; }
+.ds-login-card {
+  width: min(360px, 90vw); padding: 28px 26px; text-align: center;
+  background: var(--ds-panel); border: 1px solid var(--ds-line); border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+.ds-login-mark { font-size: 40px; }
+.ds-login-card h2 { margin: 8px 0 2px; font-size: 22px; letter-spacing: 2px; }
+.ds-login-sub { color: var(--ds-muted); font-size: 12px; margin: 0 0 18px; }
+.ds-login-name {
+  width: 100%; box-sizing: border-box; padding: 10px 12px;
+  font-size: 15px; font-family: var(--ds-ui); text-align: center;
+  background: #0b0f17; border: 1px solid var(--ds-line); border-radius: 10px;
+  color: var(--ds-text); outline: none;
+}
+.ds-login-name:focus { border-color: var(--ds-accent); }
+.ds-gender-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+.ds-gender-card {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 12px; font-size: 28px; line-height: 1;
+  background: #10151f; border: 1px solid var(--ds-line); border-radius: 12px;
+  color: var(--ds-text); cursor: pointer; font-family: var(--ds-ui);
+}
+.ds-gender-card span { font-size: 13px; color: var(--ds-muted); }
+.ds-gender-card:hover { border-color: #3b4762; }
+.ds-gender-card.is-active { border-color: var(--ds-accent); background: rgba(110, 168, 254, 0.16); }
+.ds-gender-card.is-active span { color: var(--ds-text); }
+.ds-login-start { width: 100%; }
 
 @media (max-width: 1080px) {
   :root { --ds-side-width: 0px; }

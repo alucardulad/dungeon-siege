@@ -68,6 +68,11 @@ interface SaveData {
   progress: Record<string, Progress>
 }
 
+interface Profile {
+  name: string
+  gender: 'male' | 'female'
+}
+
 function injectStyles(doc: Document): void {
   if (doc.getElementById('dungeon-siege-styles')) return
   const style = doc.createElement('style')
@@ -112,6 +117,13 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   const stopButton = $<HTMLButtonElement>('ds-stop')
   const resetButton = $<HTMLButtonElement>('ds-reset')
   const answerButton = $<HTMLButtonElement>('ds-answer')
+  const profileButton = $<HTMLButtonElement>('ds-profile')
+  const heroNameEl = $<HTMLElement>('ds-hero-name')
+  const heroAvatarEl = $<HTMLElement>('ds-profile-avatar')
+  const loginEl = $<HTMLElement>('ds-login')
+  const loginNameEl = $<HTMLInputElement>('ds-login-name')
+  const loginStartButton = $<HTMLButtonElement>('ds-login-start')
+  const genderPickerEl = $<HTMLElement>('ds-gender-picker')
 
   // 浏览器预览需要一块画布交给 Canvas2D 渲染器
   let stage: StageView | null = null
@@ -125,13 +137,19 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   const save = loadSave(storageKey)
   const audio: SoundPlayer = options.audio ?? new WebAudioPlayer()
   let muted = doc.defaultView?.localStorage?.getItem(muteKey) === '1'
+  const profileKey = `${storageKey}:profile`
+  let profile = loadProfile()
+  let heroGender: 'male' | 'female' = profile?.gender ?? 'male'
+  let heroName: string = profile?.name ?? '英雄'
+  let selectedGender: 'male' | 'female' = heroGender
   /** 上一次写进 DOM 的状态签名：值没变就不碰 DOM，减少主线程卡顿（卡顿会拖慢音效排期） */
   let statsSignature = ''
   let logsSignature = ''
 
   let currentIndex = 0
   let currentChapterId = LEVELS[0].chapter
-  let game = new Game(levels[currentIndex], { audio })
+  const makeGame = () => new Game(currentLevel(), { audio, heroGender, heroName })
+  let game = makeGame()
   let running = false
   let logElements = new Map<number, HTMLElement>()
   let scrollConsole = false
@@ -166,6 +184,28 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
       doc.defaultView?.localStorage?.setItem(storageKey, JSON.stringify(save))
     } catch {
       // 隐私模式下 localStorage 可能不可用，忽略即可
+    }
+  }
+
+  function loadProfile(): Profile | null {
+    try {
+      const raw = doc.defaultView?.localStorage?.getItem(profileKey)
+      if (!raw) return null
+      const parsed = JSON.parse(raw) as Partial<Profile>
+      if (parsed && typeof parsed.name === 'string' && (parsed.gender === 'male' || parsed.gender === 'female')) {
+        return { name: parsed.name.slice(0, 12), gender: parsed.gender }
+      }
+    } catch {
+      // 忽略损坏的存档
+    }
+    return null
+  }
+
+  function persistProfile(): void {
+    try {
+      doc.defaultView?.localStorage?.setItem(profileKey, JSON.stringify({ name: heroName, gender: heroGender }))
+    } catch {
+      // 隐私模式忽略
     }
   }
 
@@ -274,7 +314,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     save.code[currentLevel().id] = editor.value
     currentIndex = index
     currentChapterId = levels[currentIndex].chapter
-    game = new Game(currentLevel(), { audio })
+    game = makeGame()
     editor.value = save.code[currentLevel().id] ?? currentLevel().starter
     editor.setErrorLine(null)
     clearConsole()
@@ -544,11 +584,63 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   doc.defaultView?.addEventListener('keydown', unlockAudio, { once: true })
   applyMute(muted)
 
+  // ------------------------------------------------------------ 登录 / 选人
+
+  function updateGreeting(): void {
+    heroNameEl.textContent = heroName
+    heroAvatarEl.textContent = heroGender === 'female' ? '👧' : '👦'
+  }
+
+  function renderGenderPicker(): void {
+    Array.from(genderPickerEl.children).forEach((child) => {
+      const card = child as HTMLElement
+      card.classList.toggle('is-active', card.dataset.gender === selectedGender)
+    })
+  }
+
+  function openLogin(): void {
+    if (running) {
+      game.stop()
+      setRunning(false)
+    }
+    loginNameEl.value = heroName === '英雄' ? '' : heroName
+    selectedGender = heroGender
+    renderGenderPicker()
+    loginEl.classList.remove('hidden')
+    loginNameEl.focus()
+  }
+
+  function closeLoginAndApply(): void {
+    heroName = (loginNameEl.value.trim() || '英雄').slice(0, 12)
+    heroGender = selectedGender
+    profile = { name: heroName, gender: heroGender }
+    persistProfile()
+    loginEl.classList.add('hidden')
+    updateGreeting()
+    game = makeGame()
+    updateStats()
+    setStatus('准备就绪')
+  }
+
+  profileButton.addEventListener('click', openLogin)
+  loginStartButton.addEventListener('click', closeLoginAndApply)
+  loginNameEl.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') closeLoginAndApply()
+  })
+  genderPickerEl.addEventListener('click', (event) => {
+    const card = (event.target as HTMLElement).closest<HTMLElement>('[data-gender]')
+    if (!card) return
+    selectedGender = card.dataset.gender as 'male' | 'female'
+    renderGenderPicker()
+  })
+
   updateBriefing()
   buildChapters()
   buildLevelList()
   updateStats()
   setRunning(false)
+  updateGreeting()
+  if (!profile) openLogin()
   editor.focus()
   options.onLevelChange?.(currentLevel(), game)
 

@@ -11,6 +11,10 @@ export const UI_MARKUP = `
     <span class="ds-brand-tag">CodeDungeon · 用代码指挥英雄</span>
   </div>
   <div class="ds-topbar-right">
+    <button id="ds-profile" class="ds-profile" title="修改名字或角色">
+      <span class="ds-profile-avatar" id="ds-profile-avatar">👤</span>
+      <span id="ds-hero-name">英雄</span>
+    </button>
     <span class="ds-progress" id="ds-progress"></span>
     <span class="ds-status" id="ds-status">准备就绪</span>
     <button id="ds-mute" class="ds-mini" title="音效开关">🔊</button>
@@ -54,6 +58,19 @@ export const UI_MARKUP = `
   <button id="ds-stop" class="ds-btn">⏹ 停止</button>
   <button id="ds-reset" class="ds-btn">↺ 重置</button>
   <button id="ds-answer" class="ds-btn">💡 看答案</button>
+</div>
+<div class="ds-login hidden" id="ds-login">
+  <div class="ds-login-card">
+    <div class="ds-login-mark">⚔️</div>
+    <h2>地牢围攻</h2>
+    <p class="ds-login-sub">给自己起个名字，选一位英雄</p>
+    <input id="ds-login-name" class="ds-login-name" maxlength="12" placeholder="输入你的名字" autocomplete="off" />
+    <div class="ds-gender-picker" id="ds-gender-picker">
+      <button type="button" class="ds-gender-card" data-gender="male">♂<span>男英雄</span></button>
+      <button type="button" class="ds-gender-card" data-gender="female">♀<span>女英雄</span></button>
+    </div>
+    <button id="ds-login-start" class="ds-btn ds-primary ds-login-start">开始冒险</button>
+  </div>
 </div>
 <div class="ds-overlay hidden" id="ds-overlay">
   <div class="ds-dialog" id="ds-dialog"></div>

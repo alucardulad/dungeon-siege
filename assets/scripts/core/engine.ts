@@ -26,6 +26,10 @@ export interface GameOptions {
   onLog?: (entry: LogEntry) => void
   /** 音效播放器；不传就是静音 */
   audio?: SoundPlayer
+  /** 英雄的性别，决定立绘（默认男） */
+  heroGender?: 'male' | 'female'
+  /** 英雄的名字，会出现在对话气泡的日志里（默认「英雄」） */
+  heroName?: string
 }
 
 export interface RunResult {
@@ -89,6 +93,8 @@ export class Game {
   private maxSteps: number
   private onLog?: (entry: LogEntry) => void
   private audio: SoundPlayer | null
+  private heroGender: 'male' | 'female'
+  private heroName: string
   private views = new Map<string, View>()
   private effects: EffectState[] = []
   private bubbles: BubbleState[] = []
@@ -106,6 +112,8 @@ export class Game {
     this.maxSteps = options.maxSteps ?? 20000
     this.onLog = options.onLog
     this.audio = options.audio ?? null
+    this.heroGender = options.heroGender ?? 'male'
+    this.heroName = options.heroName ?? '英雄'
     this.world = createWorld(level)
     this.reset()
   }
@@ -288,7 +296,7 @@ export class Game {
   say(text: unknown): void {
     const hero = this.world.hero
     const value = String(text).slice(0, 60)
-    this.log('hero', `英雄说：${value}`)
+    this.log('hero', `${this.heroName} 说：${value}`)
     this.bubbles = this.bubbles.filter((bubble) => bubble.unitId !== hero.id)
     this.bubbles.push({ text: value, unitId: hero.id, elapsed: 0 })
   }
@@ -554,6 +562,7 @@ export class Game {
       units.push({
         id: unit.id,
         type: unit.type,
+        gender: unit.type === 'hero' ? this.heroGender : undefined,
         x: (view.x + 0.5) * tile,
         y: (view.y + 0.5) * tile,
         hpRatio: unit.maxHp > 0 ? Math.max(0, unit.hp) / unit.maxHp : 0,

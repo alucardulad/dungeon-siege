@@ -10,6 +10,8 @@ import type { ItemType, TileType, UnitType } from './types'
 export interface FrameUnit {
   id: string
   type: UnitType
+  /** 英雄的性别，决定立绘（其他单位没有这个字段） */
+  gender?: 'male' | 'female'
   /** 像素坐标（格子中心） */
   x: number
   y: number
@@ -102,6 +104,8 @@ export const PALETTE = {
   hero: '#6ea8fe',
   heroDark: '#3a63c8',
   heroFace: '#ffd7ad',
+  hair: '#4a2f22',
+  femaleAccent: '#f2798f',
   munchkin: '#a6e26a',
   ogre: '#7cc45c',
   chief: '#e07a55',
@@ -222,13 +226,36 @@ function paintUnit(unit: FrameUnit, size: number, painter: Painter): void {
         alpha,
         radius: 5 * scale,
       })
-      // 头
-      painter.circle(x, y - 15 * scale, 8 * scale, { fill: flash > 0.35 ? PALETTE.hit : PALETTE.heroFace, alpha })
-      // 头盔
-      painter.polygon(
-        [x - 8 * scale, y - 17 * scale, x + 8 * scale, y - 17 * scale, x, y - 27 * scale],
-        { fill: PALETTE.heroDark, alpha },
-      )
+      if (unit.gender === 'female') {
+        // 马尾（在背后）
+        painter.polygon(
+          [
+            x - unit.facing * 7 * scale, y - 18 * scale,
+            x - unit.facing * 15 * scale, y - 9 * scale,
+            x - unit.facing * 8 * scale, y - 5 * scale,
+          ],
+          { fill: PALETTE.hair, alpha },
+        )
+        // 后脑头发
+        painter.circle(x, y - 16 * scale, 9 * scale, { fill: PALETTE.hair, alpha })
+        // 脸
+        painter.circle(x, y - 15 * scale, 7.5 * scale, { fill: flash > 0.35 ? PALETTE.hit : PALETTE.heroFace, alpha })
+        // 发带
+        painter.rect(x - 7.5 * scale, y - 21 * scale, 15 * scale, 3 * scale, {
+          fill: PALETTE.femaleAccent,
+          alpha,
+          radius: 1.5 * scale,
+        })
+        painter.circle(x + 7 * scale, y - 21 * scale, 2.2 * scale, { fill: PALETTE.femaleAccent, alpha })
+      } else {
+        // 头
+        painter.circle(x, y - 15 * scale, 8 * scale, { fill: flash > 0.35 ? PALETTE.hit : PALETTE.heroFace, alpha })
+        // 头盔
+        painter.polygon(
+          [x - 8 * scale, y - 17 * scale, x + 8 * scale, y - 17 * scale, x, y - 27 * scale],
+          { fill: PALETTE.heroDark, alpha },
+        )
+      }
       // 眼睛
       painter.circle(x + unit.facing * 2 * scale, y - 15 * scale, 1.4 * scale, { fill: PALETTE.bubbleText, alpha })
       painter.circle(x + unit.facing * 5 * scale, y - 15 * scale, 1.4 * scale, { fill: PALETTE.bubbleText, alpha })

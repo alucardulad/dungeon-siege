@@ -152,3 +152,26 @@ test('第 4 章可以用 while；第 5 章才允许自定义函数', async () =>
   const ch5Function = await play(ch5, 'function 打() {\n  const 敌人 = hero.findNearestEnemy()\n  if (敌人 && hero.distanceTo(敌人) <= 1) { hero.attack(敌人) }\n}\nwhile (true) {\n  打()\n  if (hero.canMoveRight()) { hero.moveRight() } else { break }\n}')
   assert.equal(ch5Function.result.error, null)
 })
+
+test('英雄的性别进入画面帧，名字进入对话日志', async () => {
+  const level = findLevel('level-1')
+  assert.ok(level)
+  const game = new Game(level, { instant: true, heroGender: 'female', heroName: '小芳' })
+  const frame = game.getFrame()
+  const hero = frame.units.find((unit) => unit.type === 'hero')
+  assert.equal(hero?.gender, 'female')
+
+  game.say('出发')
+  assert.ok(game.logs.some((entry) => entry.text.includes('小芳 说：出发')))
+})
+
+test('默认是男英雄，名字默认「英雄」', async () => {
+  const level = findLevel('level-1')
+  assert.ok(level)
+  const game = new Game(level, { instant: true })
+  const hero = game.getFrame().units.find((unit) => unit.type === 'hero')
+  assert.equal(hero?.gender, 'male')
+
+  game.say('冲')
+  assert.ok(game.logs.some((entry) => entry.text.includes('英雄 说：冲')))
+})
