@@ -23,7 +23,6 @@
     "audio:wav": "node tools/make-wav.mjs",
     "audio": "node tools/make-midi.mjs && node tools/make-wav.mjs",
     "about:image": "node tools/make-about-image.mjs",
-    "about:md": "node --import ./tools/register-ts.mjs tools/make-about-md.mjs",
     "check:cocos": "node --import ./tools/register-ts.mjs tools/check-cocos.mjs",
     "build:web": "esbuild preview/main.ts --bundle --outfile=dist/app.js --format=iife --target=chrome120 --minify --sourcemap --log-level=warning",
     "build:html": "node tools/make-dist.mjs",
