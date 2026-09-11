@@ -118,7 +118,7 @@ assets/scripts/cocos/    Cocos 层：Graphics 画笔、GameRoot 入口组件
 assets/scenes/           Cocos 场景（由 tools/make-scene.mjs 生成）
 assets/resources/audio/  Cocos 原生平台用的音效 wav（npm run audio:wav 生成）
 audio/midi/              导出的 MIDI 文件，可在 DAW 里编辑音效
-docs/images/             打赏码原图（npm run about:image 会把它内联进代码）
+docs/images/             donate-qr.png 打赏码原海报 / donate-qr-card.png 裁剪版（内联进代码用这张）
 preview/                 浏览器预览：入口 + Canvas2D 画笔
 tests/                   Node 原生测试（解释器 + 关卡通关 + 动画时序）
 tools/                   开发服务器、场景生成、自检脚本

@@ -32,5 +32,5 @@ test('仓库里的 ABOUT.md 与游戏内关于页保持同步', () => {
     assert.ok(markdown.includes(paragraph), `ABOUT.md 缺少这一段：${paragraph.slice(0, 12)}…`)
   }
   assert.ok(markdown.includes(ABOUT.email), 'ABOUT.md 缺少邮箱')
-  assert.ok(markdown.includes('docs/images/donate-qr.png'), 'ABOUT.md 缺少打赏码图片')
+  assert.ok(markdown.includes('docs/images/donate-qr-card.png'), 'ABOUT.md 缺少打赏码图片')
 })

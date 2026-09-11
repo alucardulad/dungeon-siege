@@ -432,32 +432,33 @@ export const UI_STYLES = `
 }
 .ds-about-close:hover { color: var(--ds-text); border-color: #3b4762; }
 .ds-about-body {
-  padding: 16px 22px; overflow-y: auto;
   font-size: 13.5px; line-height: 1.9; color: #d7def2;
 }
 .ds-about-body p { margin: 0 0 12px; }
 .ds-about-body p:last-child { margin-bottom: 0; }
 .ds-about-body .ds-about-hi { color: var(--ds-accent); font-weight: 600; }
-.ds-about-foot {
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  padding: 14px 22px; border-top: 1px solid var(--ds-line);
-  background: #10151f;
+.ds-about-scroll { flex: 1 1 auto; overflow-y: auto; padding: 16px 22px 4px; }
+.ds-about-meta {
+  margin-top: 4px; padding-top: 14px; border-top: 1px solid var(--ds-line);
+  font-size: 13px; color: var(--ds-muted); line-height: 2;
 }
-.ds-about-meta { font-size: 13px; color: var(--ds-muted); line-height: 1.9; }
 .ds-about-meta b { color: var(--ds-text); }
 .ds-about-meta a { color: var(--ds-accent); text-decoration: none; }
 .ds-about-meta a:hover { text-decoration: underline; }
-.ds-about-donate { text-align: center; flex: 0 0 auto; }
-.ds-about-donate img {
-  width: 132px; height: 132px; display: block; border-radius: 10px;
-  background: #ffffff; border: 1px solid var(--ds-line);
+.ds-about-donate {
+  margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--ds-line);
+  text-align: center;
 }
-.ds-about-donate-title { margin-top: 6px; font-size: 12px; color: var(--ds-text); }
-.ds-about-donate-note { font-size: 11px; color: var(--ds-muted); max-width: 150px; margin: 2px auto 0; line-height: 1.5; }
-.ds-about-ok { margin: 0 22px 20px; }
+.ds-about-donate-title { font-size: 13px; font-weight: 600; color: var(--ds-text); }
+.ds-about-donate-note { font-size: 12px; color: var(--ds-muted); line-height: 1.6; margin-top: 2px; }
+.ds-about-donate img {
+  width: 280px; height: 280px; display: block; margin: 12px auto 0;
+  border-radius: 12px; background: #ffffff; border: 1px solid var(--ds-line);
+}
+.ds-about-ok { margin: 16px 22px 20px; }
 
 @media (max-height: 620px) {
-  .ds-about-donate img { width: 104px; height: 104px; }
+  .ds-about-donate img { width: 200px; height: 200px; }
 }
 
 /* 顶栏宽度不够时逐级收缩，保证用户名 / 关于 / 退出始终看得见 */

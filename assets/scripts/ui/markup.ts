@@ -91,16 +91,16 @@ export const UI_MARKUP = `
       </div>
       <button class="ds-about-close" id="ds-about-close" title="关闭">✕</button>
     </div>
-    <div class="ds-about-body" id="ds-about-body"></div>
-    <div class="ds-about-foot">
+    <div class="ds-about-scroll">
+      <div class="ds-about-body" id="ds-about-body"></div>
       <div class="ds-about-meta">
         <div>开发者：<b id="ds-about-dev"></b></div>
         <div>邮箱：<a id="ds-about-mail" href="#"></a></div>
       </div>
       <div class="ds-about-donate">
-        <img id="ds-about-qr" alt="打赏码" />
         <div class="ds-about-donate-title" id="ds-about-donate-title">打赏码</div>
         <div class="ds-about-donate-note" id="ds-about-donate-note"></div>
+        <img id="ds-about-qr" alt="打赏码" />
       </div>
     </div>
     <button id="ds-about-ok" class="ds-btn ds-primary ds-about-ok">知道了</button>

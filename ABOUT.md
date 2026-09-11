@@ -24,7 +24,9 @@
 
 如果这个小工具帮到了你，可以扫码请我喝杯咖啡 ☕
 
-![打赏码](docs/images/donate-qr.png)
+![打赏码](docs/images/donate-qr-card.png)
+
+（原海报保存在 `docs/images/donate-qr.png`；上面这张是它的裁剪版，去掉了四周空白，扫码更清楚。）
 
 ---
 

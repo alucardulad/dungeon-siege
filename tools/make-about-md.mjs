@@ -28,7 +28,9 @@ ${ABOUT.paragraphs.join('\n\n')}
 
 ${ABOUT.donateNote}
 
-![${ABOUT.donateTitle}](docs/images/donate-qr.png)
+![${ABOUT.donateTitle}](docs/images/donate-qr-card.png)
+
+（原海报保存在 \`docs/images/donate-qr.png\`；上面这张是它的裁剪版，去掉了四周空白，扫码更清楚。）
 
 ---
 
