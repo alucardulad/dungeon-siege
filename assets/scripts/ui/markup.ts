@@ -24,14 +24,15 @@ export const UI_MARKUP = `
   <nav class="ds-chapters" id="ds-chapters" aria-label="章节"></nav>
   <nav class="ds-level-list" id="ds-level-list" aria-label="关卡"></nav>
 </div>
+<aside class="ds-teacher-panel" id="ds-teacher">
+  <div class="ds-teacher-portrait" id="ds-teacher-portrait"></div>
+  <div class="ds-teacher-name" id="ds-teacher-name">导师</div>
+  <div class="ds-teacher-title" id="ds-teacher-title">地牢导师</div>
+  <div class="ds-teacher-bubble" id="ds-teacher-bubble" title="点击跳过打字">
+    <span class="ds-teacher-words" id="ds-teacher-words"></span><span class="ds-teacher-caret" aria-hidden="true">▌</span>
+  </div>
+</aside>
 <aside class="ds-side">
-  <section class="ds-teacher" id="ds-teacher">
-    <div class="ds-teacher-head">
-      <span class="ds-teacher-avatar" id="ds-teacher-avatar">👩‍🏫</span>
-      <span class="ds-teacher-name" id="ds-teacher-name">导师</span>
-    </div>
-    <p class="ds-teacher-text" id="ds-teacher-text">你好！</p>
-  </section>
   <section class="ds-panel ds-briefing">
     <h2 id="ds-level-name">第 1 关</h2>
     <p class="ds-subtitle" id="ds-level-subtitle"></p>

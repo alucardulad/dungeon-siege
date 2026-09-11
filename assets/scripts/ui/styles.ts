@@ -23,6 +23,7 @@ export const UI_STYLES = `
   --ds-mono: "SF Mono", "JetBrains Mono", "Menlo", "Consolas", monospace;
   --ds-ui: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   --ds-side-width: 520px;
+  --ds-teacher-width: 320px;
 }
 
 .ds-app {
@@ -39,6 +40,7 @@ export const UI_STYLES = `
 .ds-stage {
   position: absolute;
   inset: 0;
+  padding-left: var(--ds-teacher-width);
   padding-right: var(--ds-side-width);
   padding-top: 96px;
   padding-bottom: 80px;
@@ -144,17 +146,40 @@ export const UI_STYLES = `
   pointer-events: auto;
 }
 
-.ds-teacher {
-  flex: 0 0 auto;
-  display: flex; flex-direction: column; gap: 8px;
-  padding: 12px;
-  background: linear-gradient(135deg, rgba(58, 123, 253, 0.14), rgba(110, 168, 254, 0.05));
-  border: 1px solid var(--ds-line); border-radius: 12px;
+.ds-teacher-panel {
+  position: absolute; left: 0; top: 96px; bottom: 0; width: var(--ds-teacher-width);
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 20px 16px; overflow-y: auto;
+  background: linear-gradient(180deg, rgba(24, 31, 48, 0.92), rgba(13, 16, 23, 0.96));
+  border-right: 1px solid var(--ds-line);
+  pointer-events: auto;
 }
-.ds-teacher-head { display: flex; align-items: center; gap: 8px; }
-.ds-teacher-avatar { font-size: 26px; line-height: 1; }
-.ds-teacher-name { font-weight: 600; font-size: 13px; color: var(--ds-accent); }
-.ds-teacher-text { margin: 0; font-size: 13px; line-height: 1.65; color: #d7def2; }
+.ds-teacher-portrait {
+  width: 128px; height: 128px; flex: 0 0 auto;
+  border-radius: 50%; overflow: hidden;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45), 0 0 0 2px var(--ds-accent-strong);
+  animation: ds-bob 3.2s ease-in-out infinite;
+}
+.ds-teacher-portrait svg { width: 100%; height: 100%; display: block; }
+.ds-teacher-name { font-size: 16px; font-weight: 700; color: var(--ds-text); }
+.ds-teacher-title { font-size: 12px; color: var(--ds-accent); letter-spacing: 2px; margin-top: -4px; }
+.ds-teacher-bubble {
+  width: 100%; box-sizing: border-box; position: relative;
+  margin-top: 8px; padding: 12px 14px; min-height: 108px;
+  background: #10151f; border: 1px solid var(--ds-line); border-radius: 14px;
+  font-size: 13px; line-height: 1.75; color: #d7def2; cursor: pointer;
+}
+.ds-teacher-bubble::before {
+  content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+  border-left: 8px solid transparent; border-right: 8px solid transparent;
+  border-bottom: 8px solid #10151f;
+}
+.ds-teacher-caret {
+  display: inline-block; color: var(--ds-accent); margin-left: 1px;
+  animation: ds-caret 0.8s steps(2) infinite;
+}
+@keyframes ds-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes ds-caret { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 
 .ds-panel {
   background: var(--ds-panel);
@@ -261,7 +286,7 @@ export const UI_STYLES = `
 .ds-log-error::before { content: '✖'; color: var(--ds-error); }
 
 .ds-controls {
-  position: absolute; left: 0; right: var(--ds-side-width); bottom: 18px;
+  position: absolute; left: var(--ds-teacher-width); right: var(--ds-side-width); bottom: 18px;
   display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
   pointer-events: auto;
 }
@@ -334,13 +359,14 @@ export const UI_STYLES = `
 .ds-login-start { width: 100%; }
 
 @media (max-width: 1080px) {
-  :root { --ds-side-width: 0px; }
+  :root { --ds-side-width: 0px; --ds-teacher-width: 0px; }
   .ds-topbar, .ds-navbar { right: 0; }
+  .ds-teacher-panel { display: none; }
   .ds-side {
     top: auto; left: 0; right: 0; bottom: 0; width: auto; height: 58%;
     border-left: 0; border-top: 1px solid var(--ds-line);
   }
-  .ds-stage { padding-right: 0; padding-top: 96px; padding-bottom: 58%; }
-  .ds-controls { right: 0; bottom: calc(58% + 12px); }
+  .ds-stage { padding-left: 0; padding-right: 0; padding-top: 96px; padding-bottom: 58%; }
+  .ds-controls { left: 0; right: 0; bottom: calc(58% + 12px); }
 }
 `

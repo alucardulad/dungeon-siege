@@ -26,6 +26,7 @@ import {
 import type { SoundPlayer } from '../core/audio'
 import { WebAudioPlayer } from './audio-web'
 import { CodeEditor } from './editor'
+import { teacherPortraitSvg } from './portrait'
 import { UI_MARKUP } from './markup'
 import { UI_STYLES } from './styles'
 
@@ -114,9 +115,11 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   const statsEl = $<HTMLElement>('ds-stats')
   const statusEl = $<HTMLElement>('ds-status')
   const consoleEl = $<HTMLElement>('ds-console')
-  const teacherAvatarEl = $<HTMLElement>('ds-teacher-avatar')
+  const teacherPortraitEl = $<HTMLElement>('ds-teacher-portrait')
   const teacherNameEl = $<HTMLElement>('ds-teacher-name')
-  const teacherTextEl = $<HTMLElement>('ds-teacher-text')
+  const teacherTitleEl = $<HTMLElement>('ds-teacher-title')
+  const teacherBubbleEl = $<HTMLElement>('ds-teacher-bubble')
+  const teacherWordsEl = $<HTMLElement>('ds-teacher-words')
   const overlayEl = $<HTMLElement>('ds-overlay')
   const dialogEl = $<HTMLElement>('ds-dialog')
   const canvasHost = $<HTMLElement>('ds-canvas-host')
@@ -619,13 +622,52 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
 
   function updateTeacher(): void {
     teacher = teacherForHero(heroGender)
-    teacherAvatarEl.textContent = teacher.avatar
-    teacherNameEl.textContent = `${teacher.name} · ${teacher.title}`
+    teacherPortraitEl.innerHTML = teacherPortraitSvg(teacher.gender)
+    teacherNameEl.textContent = teacher.name
+    teacherTitleEl.textContent = teacher.title
   }
 
+  // ------------------------------------------------------------ 打字机
+
+  let typeFull = ''
+  let typeIndex = 0
+  let typeTimer: number | undefined
+
   function teacherSay(text: string): void {
-    teacherTextEl.textContent = text
+    typeFull = text
+    typeIndex = 0
+    if (typeTimer !== undefined) {
+      window.clearTimeout(typeTimer)
+      typeTimer = undefined
+    }
+    renderTeacherWords()
+    typeStep()
   }
+
+  function typeStep(): void {
+    if (typeIndex >= typeFull.length) {
+      typeTimer = undefined
+      return
+    }
+    typeIndex = Math.min(typeFull.length, typeIndex + 1)
+    renderTeacherWords()
+    typeTimer = window.setTimeout(typeStep, 18 + Math.floor(Math.random() * 22))
+  }
+
+  function renderTeacherWords(): void {
+    teacherWordsEl.textContent = typeFull.slice(0, typeIndex)
+  }
+
+  function finishTyping(): void {
+    if (typeTimer !== undefined) {
+      window.clearTimeout(typeTimer)
+      typeTimer = undefined
+    }
+    typeIndex = typeFull.length
+    renderTeacherWords()
+  }
+
+  teacherBubbleEl.addEventListener('click', finishTyping)
 
   /** 根据连续失败次数，给出当前这一条提示。 */
   function teacherHint(): string {
