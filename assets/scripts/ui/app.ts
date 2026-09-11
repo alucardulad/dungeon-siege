@@ -25,6 +25,7 @@ import {
 } from '../core/index'
 import type { SoundPlayer } from '../core/audio'
 import { WebAudioPlayer } from './audio-web'
+import { ABOUT } from './about'
 import { CodeEditor } from './editor'
 import { teacherPortraitSvg } from './portrait'
 import { UI_MARKUP } from './markup'
@@ -120,6 +121,18 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   const teacherTitleEl = $<HTMLElement>('ds-teacher-title')
   const teacherBubbleEl = $<HTMLElement>('ds-teacher-bubble')
   const teacherWordsEl = $<HTMLElement>('ds-teacher-words')
+  const aboutButton = $<HTMLButtonElement>('ds-about-btn')
+  const aboutEl = $<HTMLElement>('ds-about')
+  const aboutTitleEl = $<HTMLElement>('ds-about-title')
+  const aboutSubEl = $<HTMLElement>('ds-about-sub')
+  const aboutBodyEl = $<HTMLElement>('ds-about-body')
+  const aboutDevEl = $<HTMLElement>('ds-about-dev')
+  const aboutMailEl = $<HTMLAnchorElement>('ds-about-mail')
+  const aboutQrEl = $<HTMLImageElement>('ds-about-qr')
+  const aboutDonateTitleEl = $<HTMLElement>('ds-about-donate-title')
+  const aboutDonateNoteEl = $<HTMLElement>('ds-about-donate-note')
+  const aboutCloseButton = $<HTMLButtonElement>('ds-about-close')
+  const aboutOkButton = $<HTMLButtonElement>('ds-about-ok')
   const overlayEl = $<HTMLElement>('ds-overlay')
   const dialogEl = $<HTMLElement>('ds-dialog')
   const canvasHost = $<HTMLElement>('ds-canvas-host')
@@ -762,6 +775,43 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     setStatus('已退出登录')
     openLogin()
   }
+
+  // ------------------------------------------------------------ 关于
+
+  const escapeHtml = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
+  function renderAbout(): void {
+    aboutTitleEl.textContent = ABOUT.title
+    aboutSubEl.textContent = ABOUT.subtitle
+    aboutBodyEl.innerHTML = ABOUT.paragraphs
+      .map((text, index) => `<p${index === 0 ? ' class="ds-about-hi"' : ''}>${escapeHtml(text)}</p>`)
+      .join('')
+    aboutDevEl.textContent = ABOUT.developer
+    aboutMailEl.textContent = ABOUT.email
+    aboutMailEl.setAttribute('href', `mailto:${ABOUT.email}`)
+    aboutQrEl.setAttribute('src', ABOUT.qrImage)
+    aboutDonateTitleEl.textContent = ABOUT.donateTitle
+    aboutDonateNoteEl.textContent = ABOUT.donateNote
+  }
+
+  function openAbout(): void {
+    renderAbout()
+    aboutEl.classList.remove('hidden')
+  }
+
+  function closeAbout(): void {
+    aboutEl.classList.add('hidden')
+  }
+
+  aboutButton.addEventListener('click', openAbout)
+  aboutCloseButton.addEventListener('click', closeAbout)
+  aboutOkButton.addEventListener('click', closeAbout)
+  aboutEl.addEventListener('click', (event) => {
+    if (event.target === aboutEl) closeAbout()
+  })
+  doc.defaultView?.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeAbout()
+  })
 
   updateBriefing()
   buildChapters()

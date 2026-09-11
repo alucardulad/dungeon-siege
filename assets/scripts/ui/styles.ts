@@ -310,6 +310,12 @@ export const UI_STYLES = `
   padding: 3px 9px; cursor: pointer;
 }
 .ds-logout:hover { color: var(--ds-error); border-color: var(--ds-error); }
+.ds-about-btn {
+  font-family: var(--ds-ui); font-size: 12px; color: var(--ds-muted);
+  background: transparent; border: 1px solid var(--ds-line); border-radius: 6px;
+  padding: 3px 9px; cursor: pointer;
+}
+.ds-about-btn:hover { color: var(--ds-accent); border-color: var(--ds-accent); }
 .ds-btn kbd { font-family: var(--ds-mono); font-size: 11px; background: rgba(255, 255, 255, 0.12); border-radius: 4px; padding: 1px 4px; }
 
 .ds-overlay {
@@ -363,6 +369,64 @@ export const UI_STYLES = `
 .ds-gender-card.is-active { border-color: var(--ds-accent); background: rgba(110, 168, 254, 0.16); }
 .ds-gender-card.is-active span { color: var(--ds-text); }
 .ds-login-start { width: 100%; }
+
+/* ---------------------------------------------------------------- 关于 */
+
+.ds-about {
+  position: absolute; inset: 0; z-index: 45;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(6, 9, 14, 0.78);
+  padding: 24px;
+}
+.ds-about.hidden { display: none; }
+.ds-about-card {
+  width: min(620px, 94vw); max-height: 88vh;
+  display: flex; flex-direction: column;
+  background: var(--ds-panel); border: 1px solid var(--ds-line); border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+.ds-about-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  padding: 20px 22px 12px;
+  border-bottom: 1px solid var(--ds-line);
+}
+.ds-about-head h2 { margin: 0; font-size: 20px; }
+.ds-about-sub { margin: 4px 0 0; font-size: 12px; color: var(--ds-muted); }
+.ds-about-close {
+  font-size: 14px; color: var(--ds-muted); background: transparent;
+  border: 1px solid var(--ds-line); border-radius: 8px;
+  width: 28px; height: 28px; cursor: pointer; flex: 0 0 auto;
+}
+.ds-about-close:hover { color: var(--ds-text); border-color: #3b4762; }
+.ds-about-body {
+  padding: 16px 22px; overflow-y: auto;
+  font-size: 13.5px; line-height: 1.9; color: #d7def2;
+}
+.ds-about-body p { margin: 0 0 12px; }
+.ds-about-body p:last-child { margin-bottom: 0; }
+.ds-about-body .ds-about-hi { color: var(--ds-accent); font-weight: 600; }
+.ds-about-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 14px 22px; border-top: 1px solid var(--ds-line);
+  background: #10151f;
+}
+.ds-about-meta { font-size: 13px; color: var(--ds-muted); line-height: 1.9; }
+.ds-about-meta b { color: var(--ds-text); }
+.ds-about-meta a { color: var(--ds-accent); text-decoration: none; }
+.ds-about-meta a:hover { text-decoration: underline; }
+.ds-about-donate { text-align: center; flex: 0 0 auto; }
+.ds-about-donate img {
+  width: 132px; height: 132px; display: block; border-radius: 10px;
+  background: #ffffff; border: 1px solid var(--ds-line);
+}
+.ds-about-donate-title { margin-top: 6px; font-size: 12px; color: var(--ds-text); }
+.ds-about-donate-note { font-size: 11px; color: var(--ds-muted); max-width: 150px; margin: 2px auto 0; line-height: 1.5; }
+.ds-about-ok { margin: 0 22px 20px; }
+
+@media (max-height: 620px) {
+  .ds-about-donate img { width: 104px; height: 104px; }
+}
 
 @media (max-width: 1080px) {
   :root { --ds-side-width: 0px; --ds-teacher-width: 0px; }
