@@ -14,6 +14,7 @@
     "audio:wav": "node tools/make-wav.mjs",
     "audio": "node tools/make-midi.mjs && node tools/make-wav.mjs",
     "about:image": "node tools/make-about-image.mjs",
+    "about:md": "node --import ./tools/register-ts.mjs tools/make-about-md.mjs",
     "check:cocos": "node --import ./tools/register-ts.mjs tools/check-cocos.mjs"
   },
   "private": true
