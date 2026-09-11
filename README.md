@@ -50,7 +50,16 @@ npm run dev         # 浏览器预览（localhost:5173）
 npm test            # 核心逻辑测试：解释器 + 7 个关卡的参考解
 npm run scene       # 重新生成 assets/scenes/main.scene
 npm run check:cocos # 提交前自检：场景引用、脚本 uuid、关卡地图、工程配置
+npm run build       # 生成 Electron 使用的静态网页产物
+npm run build:single # 生成双击即玩的单文件 HTML
+npm run dist:mac    # 打包 macOS 安装包
+npm run dist:win    # 打包 Windows 安装包
 ```
+
+### 打包发布（用户零环境）
+
+普通用户不需要安装 Node.js 或 Cocos Creator。桌面安装包由 Electron 打包，
+同时提供双击即玩的单文件 HTML。完整说明见 [docs/打包发布.md](docs/打包发布.md)。
 
 ## 玩法与指令
 

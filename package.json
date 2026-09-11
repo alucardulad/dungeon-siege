@@ -2,10 +2,19 @@
   "name": "dungeon-siege",
   "uuid": "7c2a5f10-93b4-4d61-8f7a-2e5c4b910307",
   "version": "3.8.4",
+  "description": "地牢围攻 · CodeDungeon：用代码指挥英雄的编程入门小游戏",
+  "author": {
+    "name": "alucardulad",
+    "email": "alucardulad@gmail.com"
+  },
+  "main": "electron/main.cjs",
   "creator": {
     "version": "3.8.4"
   },
   "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "scripts": {
     "dev": "node tools/dev-server.mjs",
     "test": "node --test --import ./tools/register-ts.mjs tests/*.test.ts",
@@ -15,7 +24,84 @@
     "audio": "node tools/make-midi.mjs && node tools/make-wav.mjs",
     "about:image": "node tools/make-about-image.mjs",
     "about:md": "node --import ./tools/register-ts.mjs tools/make-about-md.mjs",
-    "check:cocos": "node --import ./tools/register-ts.mjs tools/check-cocos.mjs"
+    "check:cocos": "node --import ./tools/register-ts.mjs tools/check-cocos.mjs",
+    "build:web": "esbuild preview/main.ts --bundle --outfile=dist/app.js --format=iife --target=chrome120 --minify --sourcemap --log-level=warning",
+    "build:html": "node tools/make-dist.mjs",
+    "build:single": "npm run build:web && node tools/make-dist.mjs --single",
+    "build": "npm run build:web && npm run build:html",
+    "start:electron": "electron .",
+    "dist": "npm run build && electron-builder",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:win": "npm run build && electron-builder --win"
   },
-  "private": true
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "esbuild": "^0.25.0"
+  },
+  "private": true,
+  "build": {
+    "appId": "com.alucardulad.codedungeon",
+    "productName": "地牢围攻",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "artifactName": "CodeDungeon-${version}-${os}-${arch}.${ext}",
+    "mac": {
+      "category": "public.app-category.educational-games",
+      "identity": null,
+      "notarize": false,
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ]
+    },
+    "dmg": {
+      "artifactName": "CodeDungeon-${version}-mac-${arch}.${ext}"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "artifactName": "CodeDungeon-Setup-${version}-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "CodeDungeon-Portable-${version}-${arch}.${ext}"
+    }
+  }
 }
