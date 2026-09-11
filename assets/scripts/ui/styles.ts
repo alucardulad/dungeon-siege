@@ -72,9 +72,10 @@ export const UI_STYLES = `
   left: 0;
   right: var(--ds-side-width);
   height: var(--ds-topbar-height);
-  display: flex;
+  /* 三列网格：品牌靠左，用户名/关于/退出这一组在顶栏正中 */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
   gap: 16px;
   padding: 0 16px;
   background: linear-gradient(180deg, rgba(21, 27, 40, 0.95), rgba(17, 21, 31, 0.7));
@@ -82,10 +83,16 @@ export const UI_STYLES = `
   pointer-events: auto;
 }
 
-.ds-brand { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+.ds-brand {
+  display: flex; align-items: baseline; gap: 8px;
+  justify-self: start; min-width: 0; overflow: hidden; white-space: nowrap;
+}
 .ds-brand-mark { font-size: 20px; }
 .ds-brand-name { font-size: 17px; font-weight: 700; letter-spacing: 1px; }
-.ds-brand-tag { font-size: 12px; color: var(--ds-muted); }
+.ds-brand-tag {
+  font-size: 12px; color: var(--ds-muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 
 .ds-navbar {
   position: absolute;
@@ -113,20 +120,30 @@ export const UI_STYLES = `
 .ds-chapter-chip:hover { border-color: #3b4762; color: var(--ds-text); }
 .ds-chapter-chip.is-active { background: rgba(58, 123, 253, 0.2); border-color: var(--ds-accent); color: var(--ds-text); }
 
-.ds-topbar-right { display: flex; align-items: center; gap: 10px; }
+/* 用户名 / 进度 / 状态 / 静音 / 关于 / 退出：整组在顶栏居中，且高度统一 */
+.ds-topbar-right {
+  grid-column: 2;
+  justify-self: center;
+  display: flex; align-items: center; gap: 10px;
+}
+.ds-topbar-right > * {
+  height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  box-sizing: border-box;
+}
 .ds-profile {
   display: flex; align-items: center; gap: 8px;
   font-family: var(--ds-ui); font-size: 15px; font-weight: 600; color: var(--ds-text);
   background: rgba(110, 168, 254, 0.16);
   border: 1px solid rgba(110, 168, 254, 0.4);
-  border-radius: 999px; cursor: pointer; padding: 5px 15px 5px 5px;
+  border-radius: 999px; cursor: pointer; padding: 0 15px 0 4px;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 .ds-profile:hover { background: rgba(110, 168, 254, 0.26); border-color: var(--ds-accent); }
 .ds-profile-avatar {
   display: flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px; border-radius: 50%;
-  font-size: 17px; line-height: 1;
+  width: 26px; height: 26px; border-radius: 50%;
+  font-size: 16px; line-height: 1;
   background: #10151f; border: 1px solid var(--ds-line); flex: 0 0 auto;
 }
 .ds-progress { font-size: 12px; color: var(--ds-muted); white-space: nowrap; }
