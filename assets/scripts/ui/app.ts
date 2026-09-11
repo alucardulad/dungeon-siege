@@ -14,10 +14,14 @@ import {
   LEVELS,
   findChapter,
   levelsOfChapter,
+  teacherForHero,
+  teacherIntro,
+  teacherWin,
   type Frame,
   type LanguageFeature,
   type LevelDef,
   type RunResult,
+  type ScriptError,
 } from '../core/index'
 import type { SoundPlayer } from '../core/audio'
 import { WebAudioPlayer } from './audio-web'
@@ -110,6 +114,9 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   const statsEl = $<HTMLElement>('ds-stats')
   const statusEl = $<HTMLElement>('ds-status')
   const consoleEl = $<HTMLElement>('ds-console')
+  const teacherAvatarEl = $<HTMLElement>('ds-teacher-avatar')
+  const teacherNameEl = $<HTMLElement>('ds-teacher-name')
+  const teacherTextEl = $<HTMLElement>('ds-teacher-text')
   const overlayEl = $<HTMLElement>('ds-overlay')
   const dialogEl = $<HTMLElement>('ds-dialog')
   const canvasHost = $<HTMLElement>('ds-canvas-host')
@@ -142,6 +149,9 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   let heroGender: 'male' | 'female' = profile?.gender ?? 'male'
   let heroName: string = profile?.name ?? '英雄'
   let selectedGender: 'male' | 'female' = heroGender
+  let teacher = teacherForHero(heroGender)
+  /** 本关连续失败次数，用来逐条给出提示 */
+  let failCount = 0
   /** 上一次写进 DOM 的状态签名：值没变就不碰 DOM，减少主线程卡顿（卡顿会拖慢音效排期） */
   let statsSignature = ''
   let logsSignature = ''
@@ -323,6 +333,8 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     buildLevelList()
     setStatus('准备就绪')
     updateStats()
+    failCount = 0
+    teacherSay(teacherIntro(currentLevel().id))
     options.onLevelChange?.(currentLevel(), game)
   }
 
@@ -383,12 +395,25 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     save.code[currentLevel().id] = editor.value
     persist()
     setStatus('已填入参考解，点运行试试')
+    teacherSay('参考解已经放进编辑器了，点运行看看它是怎么过关的。')
+  }
+
+  function teacherReactToError(error: ScriptError): void {
+    if (error.code === 'locked') {
+      teacherSay('这一章还没教这个写法，先看看「本章可用」里能用的指令。')
+    } else if (error.code === 'timeout') {
+      teacherSay('这像是死循环：循环条件是不是永远成立？试试加 break，或者改一下条件。')
+    } else {
+      failCount++
+      teacherSay(`卡在第 ${error.location.line} 行啦，别慌。${teacherHint()}`)
+    }
   }
 
   function handleResult(result: RunResult): void {
     if (result.error) {
       editor.setErrorLine(result.error.location.line)
       setStatus(`第 ${result.error.location.line} 行有错误`, 'lose')
+      teacherReactToError(result.error)
       return
     }
     if (result.status === 'win') {
@@ -401,15 +426,21 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
       persist()
       buildLevelList()
       setStatus(`通关！${result.stars} 星`, 'win')
+      failCount = 0
+      teacherSay(teacherWin(heroName, result.stars, result.actions))
       showWinDialog(result.stars, result.actions)
       return
     }
     if (result.status === 'lose') {
+      failCount++
       setStatus('英雄倒下了', 'lose')
+      teacherSay(`英雄倒下了，别灰心。${teacherHint()}`)
       showLoseDialog()
       return
     }
+    failCount++
     setStatus('代码跑完了，但目标还没完成')
+    teacherSay(`程序跑完了，但任务还没完成。${teacherHint()}`)
   }
 
   // ------------------------------------------------------------ 弹窗
@@ -586,6 +617,24 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
 
   // ------------------------------------------------------------ 登录 / 选人
 
+  function updateTeacher(): void {
+    teacher = teacherForHero(heroGender)
+    teacherAvatarEl.textContent = teacher.avatar
+    teacherNameEl.textContent = `${teacher.name} · ${teacher.title}`
+  }
+
+  function teacherSay(text: string): void {
+    teacherTextEl.textContent = text
+  }
+
+  /** 根据连续失败次数，给出当前这一条提示。 */
+  function teacherHint(): string {
+    const hints = currentLevel().hints
+    if (hints.length === 0) return '再试一次，观察英雄卡在了哪一步。'
+    const index = Math.min(Math.max(0, failCount - 1), hints.length - 1)
+    return hints[index]
+  }
+
   function updateGreeting(): void {
     heroNameEl.textContent = heroName
     heroAvatarEl.textContent = heroGender === 'female' ? '👧' : '👦'
@@ -617,6 +666,8 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     persistProfile()
     loginEl.classList.add('hidden')
     updateGreeting()
+    updateTeacher()
+    teacherSay(`${heroName}，欢迎来到地牢！我是${teacher.name}，会一路陪你闯过 49 关。`)
     game = makeGame()
     updateStats()
     setStatus('准备就绪')
@@ -640,6 +691,8 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   updateStats()
   setRunning(false)
   updateGreeting()
+  updateTeacher()
+  teacherSay(teacherIntro(currentLevel().id))
   if (!profile) openLogin()
   editor.focus()
   options.onLevelChange?.(currentLevel(), game)

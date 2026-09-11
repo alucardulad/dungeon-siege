@@ -25,6 +25,13 @@ export const UI_MARKUP = `
   <nav class="ds-level-list" id="ds-level-list" aria-label="关卡"></nav>
 </div>
 <aside class="ds-side">
+  <section class="ds-teacher" id="ds-teacher">
+    <div class="ds-teacher-head">
+      <span class="ds-teacher-avatar" id="ds-teacher-avatar">👩‍🏫</span>
+      <span class="ds-teacher-name" id="ds-teacher-name">导师</span>
+    </div>
+    <p class="ds-teacher-text" id="ds-teacher-text">你好！</p>
+  </section>
   <section class="ds-panel ds-briefing">
     <h2 id="ds-level-name">第 1 关</h2>
     <p class="ds-subtitle" id="ds-level-subtitle"></p>

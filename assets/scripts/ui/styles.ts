@@ -144,6 +144,18 @@ export const UI_STYLES = `
   pointer-events: auto;
 }
 
+.ds-teacher {
+  flex: 0 0 auto;
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 12px;
+  background: linear-gradient(135deg, rgba(58, 123, 253, 0.14), rgba(110, 168, 254, 0.05));
+  border: 1px solid var(--ds-line); border-radius: 12px;
+}
+.ds-teacher-head { display: flex; align-items: center; gap: 8px; }
+.ds-teacher-avatar { font-size: 26px; line-height: 1; }
+.ds-teacher-name { font-weight: 600; font-size: 13px; color: var(--ds-accent); }
+.ds-teacher-text { margin: 0; font-size: 13px; line-height: 1.65; color: #d7def2; }
+
 .ds-panel {
   background: var(--ds-panel);
   border: 1px solid var(--ds-line);
@@ -153,7 +165,7 @@ export const UI_STYLES = `
   display: flex; flex-direction: column; gap: 8px;
   overflow: auto;
 }
-.ds-briefing { flex: 0 0 auto; max-height: 46%; }
+.ds-briefing { flex: 0 1 auto; max-height: 36%; }
 .ds-coding { flex: 1 1 auto; overflow: hidden; }
 
 .ds-panel h2 { margin: 0; font-size: 16px; }
