@@ -16,7 +16,9 @@ import {
   formatGuide,
   guideForChapter,
   GuidePicker,
+  HINT_LEADS,
   levelsOfChapter,
+  pickHint,
   teacherForHero,
   teacherIntro,
   teacherWin,
@@ -127,6 +129,8 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   const teacherFocusEl = $<HTMLElement>('ds-teacher-focus')
   const teacherBubbleEl = $<HTMLElement>('ds-teacher-bubble')
   const teacherWordsEl = $<HTMLElement>('ds-teacher-words')
+  const teacherHintButton = $<HTMLButtonElement>('ds-teacher-hint')
+  const hintButton = $<HTMLButtonElement>('ds-hint')
   const aboutButton = $<HTMLButtonElement>('ds-about-btn')
   const aboutEl = $<HTMLElement>('ds-about')
   const aboutTitleEl = $<HTMLElement>('ds-about-title')
@@ -174,6 +178,8 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   let teacher = teacherForHero(heroGender)
   const guidePicker = new GuidePicker()
   let chapterGuide = guideForChapter(LEVELS[0].chapter)
+  /** 主动点「给提示」时走到第几条 */
+  let hintCursor = 0
   /** 本关连续失败次数，用来逐条给出提示 */
   let failCount = 0
   /** 上一次写进 DOM 的状态签名：值没变就不碰 DOM，减少主线程卡顿（卡顿会拖慢音效排期） */
@@ -358,6 +364,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     setStatus('准备就绪')
     updateStats()
     failCount = 0
+    hintCursor = 0
     applyChapterGuide()
     // 第一次玩这一关讲本关要点；重玩已通关的关卡就换成本章的随机提醒
     const cleared = (save.progress[currentLevel().id]?.stars ?? 0) > 0
@@ -615,6 +622,8 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   stopButton.addEventListener('click', stopCode)
   resetButton.addEventListener('click', resetGame)
   answerButton.addEventListener('click', showAnswer)
+  hintButton.addEventListener('click', giveHint)
+  teacherHintButton.addEventListener('click', giveHint)
   $<HTMLButtonElement>('ds-clear-console').addEventListener('click', clearConsole)
 
   // 音效：第一次交互解锁浏览器音频，右上角可以随时静音
@@ -716,6 +725,23 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     return formatGuide(picked, { name: heroName, level: currentLevel().name })
   }
 
+  /** 玩家主动点「给提示」：老师讲本关提示，多条会依次轮换。 */
+  function giveHint(): void {
+    const { text, cursor } = pickHint(currentLevel().hints, hintCursor)
+    hintCursor = cursor
+    const lead = formatGuide(guidePicker.pick(`hint:${currentLevel().chapter}`, HINT_LEADS), { name: heroName })
+    teacherSay(`${lead}${text}`)
+    flashTeacherBubble()
+  }
+
+  /** 讲提示时让气泡闪一下，提示玩家看左边。 */
+  function flashTeacherBubble(): void {
+    teacherBubbleEl.classList.remove('is-hint')
+    void teacherBubbleEl.offsetWidth
+    teacherBubbleEl.classList.add('is-hint')
+    window.setTimeout(() => teacherBubbleEl.classList.remove('is-hint'), 1500)
+  }
+
   /** 根据连续失败次数，给出当前这一条提示。 */
   function teacherHint(): string {
     const hints = currentLevel().hints
@@ -806,6 +832,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     updateTeacher()
     applyChapterGuide()
     failCount = 0
+    hintCursor = 0
     setStatus('已退出登录')
     openLogin()
   }

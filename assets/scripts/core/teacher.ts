@@ -232,6 +232,18 @@ export function guideForChapter(chapterId: string): ChapterGuide {
   return CHAPTER_GUIDES[chapterId] ?? CHAPTER_GUIDES.ch1
 }
 
+/** 主动点「给提示」时，老师开头的那半句话。 */
+export const HINT_LEADS = ['来，我悄悄告诉你：', '注意这里：', '换个思路试试：', '记住这一招：']
+
+/** 按顺序取本关提示，取完从头再来。 */
+export function pickHint(hints: string[], cursor: number): { text: string; cursor: number } {
+  if (hints.length === 0) {
+    return { text: '先看看英雄每次走到哪里停下，再想想为什么。', cursor: 0 }
+  }
+  const index = ((cursor % hints.length) + hints.length) % hints.length
+  return { text: hints[index], cursor: cursor + 1 }
+}
+
 /** 把 {name} / {level} 这类占位符替换掉。 */
 export function formatGuide(text: string, values: { name?: string; level?: string; chapter?: string }): string {
   return text

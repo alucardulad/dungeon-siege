@@ -34,6 +34,7 @@ export const UI_MARKUP = `
   <div class="ds-teacher-bubble" id="ds-teacher-bubble" title="点击跳过打字">
     <span class="ds-teacher-words" id="ds-teacher-words"></span><span class="ds-teacher-caret" aria-hidden="true">▌</span>
   </div>
+  <button id="ds-teacher-hint" class="ds-hint-button" title="让老师讲讲这一关怎么做">💡 给提示</button>
 </aside>
 <aside class="ds-side">
   <section class="ds-panel ds-briefing">
@@ -69,6 +70,7 @@ export const UI_MARKUP = `
   <button id="ds-stop" class="ds-btn">⏹ 停止</button>
   <button id="ds-reset" class="ds-btn">↺ 重置</button>
   <button id="ds-answer" class="ds-btn">💡 看答案</button>
+  <button id="ds-hint" class="ds-btn ds-hint" title="让老师讲讲这一关怎么做">💡 给提示</button>
 </div>
 <div class="ds-login hidden" id="ds-login">
   <div class="ds-login-card">

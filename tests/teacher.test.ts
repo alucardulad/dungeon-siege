@@ -4,9 +4,11 @@ import test from 'node:test'
 import { CHAPTERS, LEVELS } from '../assets/scripts/core/levels'
 import {
   GuidePicker,
+  HINT_LEADS,
   formatGuide,
   guideForChapter,
   hasTeacherScript,
+  pickHint,
   teacherForHero,
   teacherIntro,
   teacherWin,
@@ -82,6 +84,7 @@ test('老师的话要适合 8~12 岁：句子短、不出现术语', () => {
     const guide = guideForChapter(chapter.id)
     lines.push(guide.focus, ...guide.opening, ...guide.stuck, ...guide.error, ...guide.praise)
   }
+  lines.push(...HINT_LEADS)
 
   const jargon = ['条件成立', '循环体', '赋值', '本质', '调试', '逻辑', '曼哈顿', '优先级', '遍历']
   for (const line of lines) {
@@ -91,4 +94,23 @@ test('老师的话要适合 8~12 岁：句子短、不出现术语', () => {
       assert.ok(!plain.includes(word), `出现了术语「${word}」：${plain}`)
     }
   }
+})
+
+test('「给提示」按顺序给出本关的每条提示，取完从头再来', () => {
+  const hints = ['第一条提示', '第二条提示', '第三条提示']
+  const first = pickHint(hints, 0)
+  const second = pickHint(hints, first.cursor)
+  const third = pickHint(hints, second.cursor)
+  const wrapped = pickHint(hints, third.cursor)
+
+  assert.equal(first.text, '第一条提示')
+  assert.equal(second.text, '第二条提示')
+  assert.equal(third.text, '第三条提示')
+  assert.equal(wrapped.text, '第一条提示', '取完之后应该回到第一条')
+})
+
+test('关卡没有写提示时，也要给一句能用的引导', () => {
+  const result = pickHint([], 0)
+  assert.ok(result.text.length > 6)
+  assert.equal(result.cursor, 0)
 })

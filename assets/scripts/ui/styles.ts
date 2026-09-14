@@ -220,6 +220,28 @@ export const UI_STYLES = `
   display: inline-block; color: var(--ds-teacher-accent, var(--ds-accent)); margin-left: 1px;
   animation: ds-caret 0.8s steps(2) infinite;
 }
+.ds-teacher-bubble.is-hint { animation: ds-hint-pulse 1.4s ease-out; }
+@keyframes ds-hint-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(var(--ds-teacher-accent-rgb, 110, 168, 254), 0.65); }
+  45% { box-shadow: 0 0 0 12px rgba(var(--ds-teacher-accent-rgb, 110, 168, 254), 0); }
+  100% { box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35); }
+}
+.ds-hint-button {
+  width: 100%; margin-top: 10px; padding: 10px 12px;
+  font-family: var(--ds-ui); font-size: 14px; font-weight: 700; color: #10141d;
+  background: var(--ds-teacher-accent, var(--ds-accent));
+  border: 0; border-radius: 10px; cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  transition: transform 0.08s ease, filter 0.15s ease;
+}
+.ds-hint-button:hover { filter: brightness(1.12); }
+.ds-hint-button:active { transform: translateY(1px); }
+.ds-btn.ds-hint {
+  background: rgba(255, 209, 102, 0.18);
+  border-color: rgba(255, 209, 102, 0.55);
+  font-weight: 600;
+}
+.ds-btn.ds-hint:hover:not(:disabled) { background: rgba(255, 209, 102, 0.28); }
 @keyframes ds-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 @keyframes ds-caret { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 
