@@ -13,6 +13,9 @@ import {
   Game,
   LEVELS,
   findChapter,
+  formatGuide,
+  guideForChapter,
+  GuidePicker,
   levelsOfChapter,
   teacherForHero,
   teacherIntro,
@@ -28,6 +31,7 @@ import { WebAudioPlayer } from './audio-web'
 import { ABOUT } from './about'
 import { CodeEditor } from './editor'
 import { teacherPortraitSvg } from './portrait'
+import { hexToRgb } from '../core/render'
 import { UI_MARKUP } from './markup'
 import { UI_STYLES } from './styles'
 
@@ -117,6 +121,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   const statusEl = $<HTMLElement>('ds-status')
   const consoleEl = $<HTMLElement>('ds-console')
   const teacherPortraitEl = $<HTMLElement>('ds-teacher-portrait')
+  const teacherPanelEl = $<HTMLElement>('ds-teacher')
   const teacherNameEl = $<HTMLElement>('ds-teacher-name')
   const teacherTitleEl = $<HTMLElement>('ds-teacher-title')
   const teacherBubbleEl = $<HTMLElement>('ds-teacher-bubble')
@@ -166,6 +171,8 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   let heroName: string = profile?.name ?? '英雄'
   let selectedGender: 'male' | 'female' = heroGender
   let teacher = teacherForHero(heroGender)
+  const guidePicker = new GuidePicker()
+  let chapterGuide = guideForChapter(LEVELS[0].chapter)
   /** 本关连续失败次数，用来逐条给出提示 */
   let failCount = 0
   /** 上一次写进 DOM 的状态签名：值没变就不碰 DOM，减少主线程卡顿（卡顿会拖慢音效排期） */
@@ -350,7 +357,10 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     setStatus('准备就绪')
     updateStats()
     failCount = 0
-    teacherSay(teacherIntro(currentLevel().id))
+    applyChapterGuide()
+    // 第一次玩这一关讲本关要点；重玩已通关的关卡就换成本章的随机提醒
+    const cleared = (save.progress[currentLevel().id]?.stars ?? 0) > 0
+    teacherSay(cleared ? guideLine('opening') : teacherIntro(currentLevel().id))
     options.onLevelChange?.(currentLevel(), game)
   }
 
@@ -404,6 +414,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     hideOverlay()
     setStatus('准备就绪')
     updateStats()
+    teacherSay(guideLine('opening'))
   }
 
   function showAnswer(): void {
@@ -415,13 +426,14 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   }
 
   function teacherReactToError(error: ScriptError): void {
+    const lead = guideLine('error')
     if (error.code === 'locked') {
-      teacherSay('这一章还没教这个写法，先看看「本章可用」里能用的指令。')
+      teacherSay(`${lead} 这一章还没教这个写法，先看看「本章可用」里能用的指令。`)
     } else if (error.code === 'timeout') {
-      teacherSay('这像是死循环：循环条件是不是永远成立？试试加 break，或者改一下条件。')
+      teacherSay(`${lead} 这像是死循环：循环条件是不是永远成立？试试加 break，或者改一下条件。`)
     } else {
       failCount++
-      teacherSay(`卡在第 ${error.location.line} 行啦，别慌。${teacherHint()}`)
+      teacherSay(`${lead} 第 ${error.location.line} 行出错，${teacherHint()}`)
     }
   }
 
@@ -443,20 +455,24 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
       buildLevelList()
       setStatus(`通关！${result.stars} 星`, 'win')
       failCount = 0
-      teacherSay(teacherWin(heroName, result.stars, result.actions))
+      teacherSay(
+        result.stars >= 3
+          ? `${guideLine('praise')}（这次只用了 ${result.actions} 次行动）`
+          : teacherWin(heroName, result.stars, result.actions),
+      )
       showWinDialog(result.stars, result.actions)
       return
     }
     if (result.status === 'lose') {
       failCount++
       setStatus('英雄倒下了', 'lose')
-      teacherSay(`英雄倒下了，别灰心。${teacherHint()}`)
+      teacherSay(`${guideLine('stuck')} ${teacherHint()}`)
       showLoseDialog()
       return
     }
     failCount++
     setStatus('代码跑完了，但目标还没完成')
-    teacherSay(`程序跑完了，但任务还没完成。${teacherHint()}`)
+    teacherSay(`${guideLine('stuck')} ${teacherHint()}`)
   }
 
   // ------------------------------------------------------------ 弹窗
@@ -683,6 +699,21 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
 
   teacherBubbleEl.addEventListener('click', finishTyping)
 
+  /** 切换到本章的引导句池与强调色。 */
+  function applyChapterGuide(): void {
+    chapterGuide = guideForChapter(currentLevel().chapter)
+    const { r, g, b } = hexToRgb(chapterGuide.accent)
+    teacherPanelEl.style.setProperty('--ds-teacher-accent', chapterGuide.accent)
+    teacherPanelEl.style.setProperty('--ds-teacher-accent-rgb', `${r}, ${g}, ${b}`)
+  }
+
+  /** 从本章句池里随机循环取一句。 */
+  function guideLine(kind: 'opening' | 'stuck' | 'error' | 'praise'): string {
+    const pool = chapterGuide[kind]
+    const picked = guidePicker.pick(`${currentLevel().chapter}:${kind}`, pool)
+    return formatGuide(picked, { name: heroName, level: currentLevel().name })
+  }
+
   /** 根据连续失败次数，给出当前这一条提示。 */
   function teacherHint(): string {
     const hints = currentLevel().hints
@@ -771,6 +802,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     updateStats()
     updateGreeting()
     updateTeacher()
+    applyChapterGuide()
     failCount = 0
     setStatus('已退出登录')
     openLogin()
@@ -820,6 +852,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   setRunning(false)
   updateGreeting()
   updateTeacher()
+  applyChapterGuide()
   teacherSay(teacherIntro(currentLevel().id))
   if (!profile) openLogin()
   editor.focus()

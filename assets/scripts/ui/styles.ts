@@ -179,32 +179,38 @@ export const UI_STYLES = `
   position: absolute; left: 0; top: var(--ds-header-height); bottom: 0; width: var(--ds-teacher-width);
   display: flex; flex-direction: column; align-items: center; gap: 10px;
   padding: 20px 16px; overflow-y: auto;
-  background: linear-gradient(180deg, rgba(24, 31, 48, 0.92), rgba(13, 16, 23, 0.96));
-  border-right: 1px solid var(--ds-line);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(var(--ds-teacher-accent-rgb, 110, 168, 254), 0.18), transparent 62%),
+    linear-gradient(180deg, rgba(24, 31, 48, 0.94), rgba(13, 16, 23, 0.97));
+  border-right: 1px solid rgba(var(--ds-teacher-accent-rgb, 110, 168, 254), 0.35);
   pointer-events: auto;
 }
 .ds-teacher-portrait {
   width: 128px; height: 128px; flex: 0 0 auto;
   border-radius: 50%; overflow: hidden;
-  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45), 0 0 0 2px var(--ds-accent-strong);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45), 0 0 0 3px var(--ds-teacher-accent, var(--ds-accent));
   animation: ds-bob 3.2s ease-in-out infinite;
 }
 .ds-teacher-portrait svg { width: 100%; height: 100%; display: block; }
-.ds-teacher-name { font-size: 16px; font-weight: 700; color: var(--ds-text); }
-.ds-teacher-title { font-size: 12px; color: var(--ds-accent); letter-spacing: 2px; margin-top: -4px; }
+.ds-teacher-name { font-size: 17px; font-weight: 700; color: var(--ds-teacher-accent, var(--ds-accent)); }
+.ds-teacher-title { font-size: 12px; color: var(--ds-teacher-accent, var(--ds-accent)); opacity: 0.9; letter-spacing: 2px; margin-top: -4px; }
 .ds-teacher-bubble {
   width: 100%; box-sizing: border-box; position: relative;
   margin-top: 8px; padding: 12px 14px; min-height: 108px;
-  background: #10151f; border: 1px solid var(--ds-line); border-radius: 14px;
-  font-size: 13px; line-height: 1.75; color: #d7def2; cursor: pointer;
+  background: linear-gradient(180deg, rgba(var(--ds-teacher-accent-rgb, 110, 168, 254), 0.16), rgba(12, 17, 27, 0.92));
+  border: 1px solid rgba(var(--ds-teacher-accent-rgb, 110, 168, 254), 0.5);
+  border-radius: 14px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+  font-size: 14px; line-height: 1.8; font-weight: 500;
+  color: #f4f8ff; cursor: pointer;
 }
 .ds-teacher-bubble::before {
   content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
   border-left: 8px solid transparent; border-right: 8px solid transparent;
-  border-bottom: 8px solid #10151f;
+  border-bottom: 8px solid rgba(var(--ds-teacher-accent-rgb, 110, 168, 254), 0.5);
 }
 .ds-teacher-caret {
-  display: inline-block; color: var(--ds-accent); margin-left: 1px;
+  display: inline-block; color: var(--ds-teacher-accent, var(--ds-accent)); margin-left: 1px;
   animation: ds-caret 0.8s steps(2) infinite;
 }
 @keyframes ds-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
