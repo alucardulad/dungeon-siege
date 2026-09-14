@@ -194,6 +194,13 @@ export const UI_STYLES = `
 .ds-teacher-portrait svg { width: 100%; height: 100%; display: block; }
 .ds-teacher-name { font-size: 17px; font-weight: 700; color: var(--ds-teacher-accent, var(--ds-accent)); }
 .ds-teacher-title { font-size: 12px; color: var(--ds-teacher-accent, var(--ds-accent)); opacity: 0.9; letter-spacing: 2px; margin-top: -4px; }
+.ds-teacher-focus {
+  width: 100%; box-sizing: border-box; margin-top: 4px; padding: 6px 10px;
+  font-size: 12px; line-height: 1.6; text-align: center; color: #e6eeff;
+  background: rgba(var(--ds-teacher-accent-rgb, 110, 168, 254), 0.14);
+  border: 1px dashed rgba(var(--ds-teacher-accent-rgb, 110, 168, 254), 0.45);
+  border-radius: 10px;
+}
 .ds-teacher-bubble {
   width: 100%; box-sizing: border-box; position: relative;
   margin-top: 8px; padding: 12px 14px; min-height: 108px;

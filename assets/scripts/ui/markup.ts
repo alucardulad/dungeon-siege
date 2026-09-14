@@ -30,6 +30,7 @@ export const UI_MARKUP = `
   <div class="ds-teacher-portrait" id="ds-teacher-portrait"></div>
   <div class="ds-teacher-name" id="ds-teacher-name">导师</div>
   <div class="ds-teacher-title" id="ds-teacher-title">地牢导师</div>
+  <div class="ds-teacher-focus" id="ds-teacher-focus"></div>
   <div class="ds-teacher-bubble" id="ds-teacher-bubble" title="点击跳过打字">
     <span class="ds-teacher-words" id="ds-teacher-words"></span><span class="ds-teacher-caret" aria-hidden="true">▌</span>
   </div>

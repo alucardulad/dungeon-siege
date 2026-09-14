@@ -124,6 +124,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   const teacherPanelEl = $<HTMLElement>('ds-teacher')
   const teacherNameEl = $<HTMLElement>('ds-teacher-name')
   const teacherTitleEl = $<HTMLElement>('ds-teacher-title')
+  const teacherFocusEl = $<HTMLElement>('ds-teacher-focus')
   const teacherBubbleEl = $<HTMLElement>('ds-teacher-bubble')
   const teacherWordsEl = $<HTMLElement>('ds-teacher-words')
   const aboutButton = $<HTMLButtonElement>('ds-about-btn')
@@ -705,6 +706,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     const { r, g, b } = hexToRgb(chapterGuide.accent)
     teacherPanelEl.style.setProperty('--ds-teacher-accent', chapterGuide.accent)
     teacherPanelEl.style.setProperty('--ds-teacher-accent-rgb', `${r}, ${g}, ${b}`)
+    teacherFocusEl.textContent = `本章要点：${chapterGuide.focus}`
   }
 
   /** 从本章句池里随机循环取一句。 */

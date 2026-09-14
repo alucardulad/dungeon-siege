@@ -75,3 +75,20 @@ test('句池里的 {name} 会被替换成英雄名字', () => {
   assert.equal(formatGuide('{level}', {}), '这一关')
   assert.ok(guideForChapter('ch5').opening.some((line) => line.includes('{name}')))
 })
+
+test('老师的话要适合 8~12 岁：句子短、不出现术语', () => {
+  const lines: string[] = LEVELS.map((level) => teacherIntro(level.id))
+  for (const chapter of CHAPTERS) {
+    const guide = guideForChapter(chapter.id)
+    lines.push(guide.focus, ...guide.opening, ...guide.stuck, ...guide.error, ...guide.praise)
+  }
+
+  const jargon = ['条件成立', '循环体', '赋值', '本质', '调试', '逻辑', '曼哈顿', '优先级', '遍历']
+  for (const line of lines) {
+    const plain = line.replace(/\{name\}/g, '小明')
+    assert.ok(plain.length <= 48, `这句话太长（${plain.length} 字），孩子读起来累：${plain}`)
+    for (const word of jargon) {
+      assert.ok(!plain.includes(word), `出现了术语「${word}」：${plain}`)
+    }
+  }
+})
