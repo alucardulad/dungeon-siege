@@ -59,10 +59,10 @@ test('第 1 关（纯移动）只有脚步音和通关音', async () => {
   assert.ok(sound.count('win') > 0, '应该有通关音')
 })
 
-test('第 4 关战斗会发出挥剑、命中、击败、受伤音效', async () => {
-  const level = findLevel('level-4')
+test('战斗关会发出挥剑、命中、击败、受伤音效', async () => {
+  const level = findLevel('level-6')
   assert.ok(level)
-  const { result, sound } = await play('level-4', level.solution)
+  const { result, sound } = await play('level-6', level.solution)
   assert.equal(result.status, 'win')
   assert.ok(sound.count('swing') > 0, '应该有挥剑音')
   assert.ok(sound.count('hit') > 0, '应该有命中音')
@@ -78,10 +78,14 @@ test('撞墙、踩尖刺、捡宝石、喝药水都有自己的音效', async ()
   const spike = await play('level-27', 'for (let i = 0; i < 4; i++) { hero.moveRight() }')
   assert.ok(spike.sound.count('spike') > 0, '踩到尖刺应该发出 spike 音')
 
-  const gem = await play('level-5', 'hero.moveRight()\nhero.moveRight()\nhero.moveRight()')
+  const gem = await play('level-4', 'hero.moveRight()\nhero.moveRight()\nhero.moveRight()')
   assert.ok(gem.sound.count('gem') > 0)
 
-  const potion = await play('level-8', 'hero.moveRight()\nhero.moveRight()\nhero.moveRight()\nhero.moveRight()')
+  // 第 30 关的药水在英雄下方 4 格处，直接下去喝就行
+  const potion = await play(
+    'level-30',
+    'hero.moveDown()\nhero.moveRight()\nhero.moveRight()\nhero.moveRight()\nhero.moveRight()',
+  )
   assert.ok(potion.sound.count('potion') > 0)
 })
 
