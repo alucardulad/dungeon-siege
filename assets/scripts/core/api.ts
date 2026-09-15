@@ -41,6 +41,23 @@ function wrapItem(item: Item): ApiObject {
   return api
 }
 
+/**
+ * 把玩家写进 hero.say(...) 的值转成一句人话。
+ * 敌人和物品是「对象」，直接转字符串会变成 [object Object]，
+ * 所以这里认出它们并报出中文名字，让「找到敌人」这类课能当场验证。
+ */
+export function describeForSay(value: unknown): string {
+  if (value === undefined || value === null) return ''
+  if (typeof value === 'object') {
+    const api = value as ApiObject
+    if (typeof api.__unitId === 'string' || typeof api.__itemId === 'string') {
+      const name = (api as { name?: unknown }).name
+      if (typeof name === 'string' && name.length > 0) return name
+    }
+  }
+  return String(value)
+}
+
 function resolveUnit(game: Game, target: unknown, method: string): Unit {
   if (target === null || target === undefined) {
     throw new Error(`${method} 需要一个敌人，但它现在是空的（null），先用 if 判断一下再攻击`)
@@ -115,9 +132,7 @@ export function createHeroApi(game: Game): Record<string, unknown> {
     if (!target || !target.pos) throw new Error('hero.distanceTo() 需要一个敌人或物品对象')
     return distance(game.world.hero, target.pos)
   })
-  define(hero, 'say', () => (text: unknown) => {
-    game.say(text === undefined || text === null ? '' : String(text))
-  })
+  define(hero, 'say', () => (text: unknown) => game.say(describeForSay(text)))
 
   const consoleApi: ApiObject = {}
   define(consoleApi, 'log', () => (text: unknown) => game.logExternal(text))

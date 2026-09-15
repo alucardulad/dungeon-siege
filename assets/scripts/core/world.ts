@@ -228,7 +228,11 @@ export function heroAttack(world: WorldState, targetId: string): WorldEvent[] {
     throw new Error('攻击目标不存在，请用 hero.findNearestEnemy() 找出敌人再攻击')
   }
   if (target.hp <= 0) {
-    throw new Error(`那个${UNIT_STATS[target.type].name}已经被打败了`)
+    // 面向孩子：多写一刀不该让程序整个中断，
+    // 只提醒一句「它已经倒下了」，然后继续往下跑。
+    return consumeTurn(world, [
+      { kind: 'blocked', unitId: hero.id, message: `那个${UNIT_STATS[target.type].name}已经倒下了，不用再打啦` },
+    ])
   }
   if (distance(hero, target) > 1) {
     return consumeTurn(world, [

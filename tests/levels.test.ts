@@ -175,3 +175,140 @@ test('默认是男英雄，名字默认「英雄」', async () => {
   game.say('冲')
   assert.ok(game.logs.some((entry) => entry.text.includes('英雄 说：冲')))
 })
+
+test('hero.say(敌人) 会说出敌人的中文名字，不会显示 [object Object]', async () => {
+  const level = findLevel('level-7')
+  assert.ok(level)
+  const { game, result } = await play(level, level.solution)
+  assert.equal(result.status, 'win')
+
+  const said = game.logs.filter((entry) => entry.kind === 'hero').map((entry) => entry.text)
+  assert.ok(said.some((text) => text.includes('食人魔')), `英雄应该说出敌人名字，实际日志：${said.join(' / ')}`)
+  assert.ok(!said.some((text) => text.includes('[object')), '不该出现 [object Object]')
+})
+
+/**
+ * 面向 10 岁左右的孩子：一关只能出现一个新东西。
+ *
+ * 这里按「指令关键词」扫一遍全部 49 关的参考解与初始代码，
+ * 找出每个概念第一次登场的关卡，然后要求：
+ *   1. 一关中第一次出现的概念不超过 1 个；
+ *   2. 面板上声明的新指令不超过 1 条；
+ *   3. 任务说明和提示里不出现「还没教」的指令。
+ */
+const CONCEPT_RULES: Array<[string, RegExp]> = [
+  ['hero.moveRight()', /hero\.moveRight\(/],
+  ['hero.moveLeft()', /hero\.moveLeft\(/],
+  ['hero.moveDown()', /hero\.moveDown\(/],
+  ['hero.moveUp()', /hero\.moveUp\(/],
+  ['hero.say()', /hero\.say\(/],
+  ['hero.findNearestEnemy()', /hero\.findNearestEnemy\(/],
+  ['const 变量', /\bconst\s/],
+  ['hero.attack()', /hero\.attack\(/],
+  ['enemy.health', /敌人\.health|boss\.health|\w+\.health/],
+  ['for 循环', /\bfor\s*\(/],
+  ['hero.distanceTo()', /hero\.distanceTo\(/],
+  ['if 判断', /\bif\s*\(/],
+  ['else', /\belse\b/],
+  ['&&', /&&/],
+  ['hero.canMoveRight()', /hero\.canMoveRight\(/],
+  ['hero.canMoveDown()', /hero\.canMoveDown\(/],
+  ['hero.lookRight()', /hero\.lookRight\(/],
+  ['else if', /\belse\s+if\b/],
+  ['hero.health', /hero\.health/],
+  ['hero.maxHealth', /hero\.maxHealth/],
+  ['while 循环', /\bwhile\s*\(/],
+  ['hero.pos.x', /hero\.pos\.x/],
+  ['hero.findNearestItem()', /hero\.findNearestItem\(/],
+  ['hero.wait()', /hero\.wait\(/],
+  ['break', /\bbreak\b/],
+]
+
+/** 每个概念第一次登场的关卡序号。 */
+function firstAppearance(): Map<string, number> {
+  const first = new Map<string, number>()
+  LEVELS.forEach((level, index) => {
+    const text = `${level.starter}\n${level.solution}`
+    for (const [name, pattern] of CONCEPT_RULES) {
+      if (!first.has(name) && pattern.test(text)) first.set(name, index)
+    }
+  })
+  return first
+}
+
+test('每一关最多只出现一个新概念（面向 10 岁孩子，一步一步来）', () => {
+  const first = firstAppearance()
+  const seen = new Set<string>()
+
+  for (const level of LEVELS) {
+    const text = `${level.starter}\n${level.solution}`
+    const introduced = CONCEPT_RULES.filter(([name, pattern]) => pattern.test(text) && !seen.has(name)).map(
+      ([name]) => name,
+    )
+    for (const [name, pattern] of CONCEPT_RULES) {
+      if (pattern.test(text)) seen.add(name)
+    }
+    assert.ok(
+      introduced.length <= 1,
+      `${level.id} ${level.name} 一关出现了 ${introduced.length} 个新概念：${introduced.join('、')}`,
+    )
+    assert.ok(
+      (level.newCommands ?? []).length <= 1,
+      `${level.id} ${level.name} 的面板声明了多个新指令：${(level.newCommands ?? []).join(' + ')}`,
+    )
+  }
+
+  assert.ok(first.has('hero.attack()'), 'attack 应该在某关被教到')
+  assert.ok(first.has('while 循环'), 'while 应该在某关被教到')
+})
+
+test('任务说明和提示里不出现还没教的指令', () => {
+  const first = firstAppearance()
+  const indexOf = new Map(LEVELS.map((level, index) => [level.id, index]))
+
+  for (const level of LEVELS) {
+    const self = indexOf.get(level.id) ?? 0
+    const texts = [level.objective, ...level.hints, ...(level.newCommands ?? [])]
+    for (const [name, pattern] of CONCEPT_RULES) {
+      const taught = first.get(name)
+      if (taught === undefined || taught <= self) continue
+      for (const text of texts) {
+        assert.ok(
+          !pattern.test(text),
+          `${level.id} ${level.name} 的文案提到了还没教的「${name}」：${text}`,
+        )
+      }
+    }
+  }
+})
+
+test('本关的新指令不能预先写在初始代码里（第 1 关除外）', () => {
+  for (const level of LEVELS) {
+    if (level.id === 'level-1') continue // 第一关留一行示范，让新手知道代码长什么样
+    for (const command of level.newCommands ?? []) {
+      if (/[\u4e00-\u9fa5]/.test(command)) continue // 中文说明式声明，不是可直接运行的代码
+      assert.ok(
+        !level.starter.includes(command.trim()),
+        `${level.id} ${level.name} 把新指令「${command}」提前写好了，孩子就没有动手的机会`,
+      )
+    }
+  }
+})
+
+test('初始代码不能直接就是答案（要留出孩子自己动手的部分）', () => {
+  const normalize = (text: string) =>
+    text
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0 && !line.startsWith('//'))
+      .join('|')
+
+  for (const level of LEVELS) {
+    if (level.id === 'level-1') continue // 第一关留一行示范
+    assert.notEqual(
+      normalize(level.starter),
+      normalize(level.solution),
+      `${level.id} ${level.name} 的初始代码就是答案，孩子只需要点一下运行`,
+    )
+  }
+})

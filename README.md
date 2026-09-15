@@ -156,6 +156,47 @@ npm run audio:wav    # assets/resources/audio/*.wav —— 给 Cocos 原生平�
 
 三星线（`par`）是按参考解实测行动数 + 2~3 次余量标定的，写得更啰嗦一点也能拿三星。
 
+### 一关只教一个新东西
+
+这门课面向 8~12 岁、多半没写过代码的孩子，所以**每一关只引入一个新概念**，
+一步一步来。完整清单（改动课程时必须保持这个顺序）：
+
+```text
+1  moveRight()          26  &&（并且）
+2  moveLeft()           27  canMoveRight()
+3  moveDown()           28  canMoveDown()
+4  moveUp()             29  lookRight() === "尖刺"
+5  hero.say()           30  lookRight() === "墙"
+6  findNearestEnemy()   31  else if
+7  const 给东西起名字    32  hero.health
+8  hero.attack()        33  hero.maxHealth
+9  enemy.health         34  第三章复习
+10 第一章复习            35  while (true)
+11 for 循环             36  hero.pos.x
+12~13 复习              37  while 里套 if
+14 攻击放进循环         38  while (findNearestItem())
+15 循环里写多行         39  while (boss.health > 0)
+16 字符串拼接           40  break
+17 复习                 41~42 复习
+18 变量当循环次数       43  hero.wait()
+19~22 复习              44~49 复习 / 综合
+23 hero.distanceTo()
+24 if 判断
+25 else
+```
+
+「找敌人」为什么要拆成好几关？因为对 10 岁的孩子来说，
+`const 敌人 = hero.findNearestEnemy()` 一句话里其实藏着三件事：
+**找敌人**、**把结果存起来**、**起个名字**。所以课程把它们拆开：
+第 6 关先认识 `findNearestEnemy()`（用 `say` 把找到的名字念出来，能当场看到结果），
+第 7 关才学 `const` 起名字，第 8 关才学 `attack` 出手。
+
+这条规则有自动化测试守着（`tests/levels.test.ts`），保证以后改关卡时不会退化：
+
+- 一关最多出现一个新概念，`newCommands` 最多一条；
+- 任务说明和提示里不出现还没教的指令；
+- 初始代码不能直接就是答案，也不能提前写好本关的新指令。
+
 ## 目录结构
 
 ```
