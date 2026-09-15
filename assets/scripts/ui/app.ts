@@ -30,6 +30,7 @@ import {
 } from '../core/index'
 import type { SoundPlayer } from '../core/audio'
 import { WebAudioPlayer } from './audio-web'
+import { TeacherVoicePlayer } from './teacher-voice'
 import { ABOUT } from './about'
 import { CodeEditor } from './editor'
 import { teacherPortraitSvg } from './portrait'
@@ -58,6 +59,8 @@ export interface GameUIOptions {
   onLevelChange?: (level: LevelDef, game: Game) => void
   /** 音效播放器；不传就自动建一个 Web 合成器（原生平台可传 file 版实现） */
   audio?: SoundPlayer
+  /** 老师提示语音播放器；传 null 可以关闭，测试时不用加载音频 */
+  teacherVoice?: TeacherVoicePlayer | null
 }
 
 export interface GameUIHandle {
@@ -169,6 +172,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
 
   const save = loadSave(storageKey)
   const audio: SoundPlayer = options.audio ?? new WebAudioPlayer()
+  const teacherVoice = options.teacherVoice === undefined ? new TeacherVoicePlayer() : options.teacherVoice
   let muted = doc.defaultView?.localStorage?.getItem(muteKey) === '1'
   const profileKey = `${storageKey}:profile`
   let profile = loadProfile()
@@ -194,6 +198,8 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   let logElements = new Map<number, HTMLElement>()
   let scrollConsole = false
   let disposed = false
+
+  teacherVoice?.setMuted(muted)
 
   const editor = new CodeEditor($<HTMLElement>('ds-editor-host'), {
     initial: save.code[levels[0].id] ?? levels[0].starter,
@@ -350,6 +356,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
 
   function selectLevel(index: number): void {
     if (index === currentIndex) return
+    teacherVoice?.stop()
     if (running) stopCode()
     save.code[currentLevel().id] = editor.value
     currentIndex = index
@@ -365,6 +372,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     updateStats()
     failCount = 0
     hintCursor = 0
+    teacherVoice?.preload(teacher.gender, currentLevel().id, currentLevel().hints.length)
     applyChapterGuide()
     // 第一次玩这一关讲本关要点；重玩已通关的关卡就换成本章的随机提醒
     const cleared = (save.progress[currentLevel().id]?.stars ?? 0) > 0
@@ -405,12 +413,14 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   }
 
   function stopCode(): void {
+    teacherVoice?.stop()
     game.stop()
     setRunning(false)
     setStatus('已停止')
   }
 
   function resetGame(): void {
+    teacherVoice?.stop()
     if (running) {
       game.stop()
       setRunning(false)
@@ -634,6 +644,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   function applyMute(next: boolean): void {
     muted = next
     audio.setMuted?.(next)
+    teacherVoice?.setMuted(next)
     muteButton.textContent = next ? '🔇' : '🔊'
     const info = webAudio.latencyInfo?.()
     const detail = info && info.state !== 'uninitialized' ? `（输出延迟约 ${info.outputLatency.toFixed(0)}ms）` : ''
@@ -663,8 +674,10 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   function updateTeacher(): void {
     teacher = teacherForHero(heroGender)
     teacherPortraitEl.innerHTML = teacherPortraitSvg(teacher.gender)
+    teacherVoice?.stop()
     teacherNameEl.textContent = teacher.name
     teacherTitleEl.textContent = teacher.title
+    teacherVoice?.preload(teacher.gender, currentLevel().id, currentLevel().hints.length)
   }
 
   // ------------------------------------------------------------ 打字机
@@ -728,9 +741,12 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
   /** 玩家主动点「给提示」：老师讲本关提示，多条会依次轮换。 */
   function giveHint(): void {
     const { text, cursor } = pickHint(currentLevel().hints, hintCursor)
+    const hintIndex = hintCursor % Math.max(1, currentLevel().hints.length)
     hintCursor = cursor
-    const lead = formatGuide(guidePicker.pick(`hint:${currentLevel().chapter}`, HINT_LEADS), { name: heroName })
+    const leadIndex = Math.max(0, HINT_LEADS.indexOf(guidePicker.pick(`hint:${currentLevel().chapter}`, HINT_LEADS)))
+    const lead = HINT_LEADS[leadIndex] ?? HINT_LEADS[0]
     teacherSay(`${lead}${text}`)
+    void teacherVoice?.playHint(teacher.gender, leadIndex, currentLevel().id, hintIndex)
     flashTeacherBubble()
   }
 
@@ -900,6 +916,7 @@ export function mountGameUI(options: GameUIOptions = {}): GameUIHandle {
     showAnswer,
     dispose() {
       disposed = true
+      teacherVoice?.dispose()
       if (frameHandle) cancelAnimationFrame(frameHandle)
       app.remove()
     },

@@ -14,3 +14,6 @@ dist/
 release/
 .DS_Store
 *.log
+视频素材/
+__pycache__/
+*.pyc

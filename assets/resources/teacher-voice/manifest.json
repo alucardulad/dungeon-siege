@@ -1,0 +1,824 @@
+{
+  "version": 1,
+  "sampleRate": 44100,
+  "voices": {
+    "female": {
+      "speaker": "琴",
+      "speed": 1
+    },
+    "male": {
+      "speaker": "提纳里",
+      "speed": 1
+    }
+  },
+  "clips": [
+    {
+      "key": "lead-0",
+      "kind": "lead",
+      "index": 0,
+      "text": "来，我悄悄告诉你："
+    },
+    {
+      "key": "lead-1",
+      "kind": "lead",
+      "index": 1,
+      "text": "注意这里："
+    },
+    {
+      "key": "lead-2",
+      "kind": "lead",
+      "index": 2,
+      "text": "换个思路试试："
+    },
+    {
+      "key": "lead-3",
+      "kind": "lead",
+      "index": 3,
+      "text": "记住这一招："
+    },
+    {
+      "key": "level-1-0",
+      "kind": "hint",
+      "levelId": "level-1",
+      "index": 0,
+      "text": "代码是一行一行往下执行的：写一行 moveRight()，英雄就走一格。"
+    },
+    {
+      "key": "level-1-1",
+      "kind": "hint",
+      "levelId": "level-1",
+      "index": 1,
+      "text": "数一数英雄和出口之间隔了几格，就写几行。"
+    },
+    {
+      "key": "level-2-0",
+      "kind": "hint",
+      "levelId": "level-2",
+      "index": 0,
+      "text": "moveLeft() 向左走一格，和 moveRight() 刚好相反。"
+    },
+    {
+      "key": "level-3-0",
+      "kind": "hint",
+      "levelId": "level-3",
+      "index": 0,
+      "text": "moveDown() 让英雄往下走一格。写两行，它就走两格。"
+    },
+    {
+      "key": "level-3-1",
+      "kind": "hint",
+      "levelId": "level-3",
+      "index": 1,
+      "text": "出口在右下角：先往下走到底，再往右走。"
+    },
+    {
+      "key": "level-3-2",
+      "kind": "hint",
+      "levelId": "level-3",
+      "index": 2,
+      "text": "宝石不用特意去捡，走过去就自动到手了。"
+    },
+    {
+      "key": "level-4-0",
+      "kind": "hint",
+      "levelId": "level-4",
+      "index": 0,
+      "text": "moveUp() 让英雄往上走一格，和 moveDown() 刚好相反。"
+    },
+    {
+      "key": "level-4-1",
+      "kind": "hint",
+      "levelId": "level-4",
+      "index": 1,
+      "text": "先数一数要往上走几格，再数往右走几格。"
+    },
+    {
+      "key": "level-4-2",
+      "kind": "hint",
+      "levelId": "level-4",
+      "index": 2,
+      "text": "路上那颗宝石走过去就自动捡到了。"
+    },
+    {
+      "key": "level-5-0",
+      "kind": "hint",
+      "levelId": "level-5",
+      "index": 0,
+      "text": "hero.say(\"你好\") 就是让英雄说出「你好」，说的话要用引号 \" \" 包起来。"
+    },
+    {
+      "key": "level-5-1",
+      "kind": "hint",
+      "levelId": "level-5",
+      "index": 1,
+      "text": "说一句话不花时间，也不会多算一步。"
+    },
+    {
+      "key": "level-5-2",
+      "kind": "hint",
+      "levelId": "level-5",
+      "index": 2,
+      "text": "说完话，再一路往右走到出口。"
+    },
+    {
+      "key": "level-6-0",
+      "kind": "hint",
+      "levelId": "level-6",
+      "index": 0,
+      "text": "findNearestEnemy() 的意思是「找到离我最近的敌人」。它会告诉你那个敌人是谁。"
+    },
+    {
+      "key": "level-6-1",
+      "kind": "hint",
+      "levelId": "level-6",
+      "index": 1,
+      "text": "把它放进 say 里：hero.say(hero.findNearestEnemy())，英雄就会说出它的名字。"
+    },
+    {
+      "key": "level-6-2",
+      "kind": "hint",
+      "levelId": "level-6",
+      "index": 2,
+      "text": "这一关不用打架：沿着上面那一行绕过去，就能走到出口。"
+    },
+    {
+      "key": "level-7-0",
+      "kind": "hint",
+      "levelId": "level-7",
+      "index": 0,
+      "text": "const 的意思是「给它起个名字」。等号左边是名字，右边是要存起来的东西。"
+    },
+    {
+      "key": "level-7-1",
+      "kind": "hint",
+      "levelId": "level-7",
+      "index": 1,
+      "text": "const 敌人 = hero.findNearestEnemy() 读作：把找到的敌人，起名叫「敌人」。"
+    },
+    {
+      "key": "level-7-2",
+      "kind": "hint",
+      "levelId": "level-7",
+      "index": 2,
+      "text": "起好名字，叫一声 hero.say(敌人)，英雄就会报出它的名字。"
+    },
+    {
+      "key": "level-7-3",
+      "kind": "hint",
+      "levelId": "level-7",
+      "index": 3,
+      "text": "这一关还是不用打架，绕过去走到出口就行。"
+    },
+    {
+      "key": "level-8-0",
+      "kind": "hint",
+      "levelId": "level-8",
+      "index": 0,
+      "text": "attack 的意思是「攻击」。括号里写你要打谁：hero.attack(敌人)。"
+    },
+    {
+      "key": "level-8-1",
+      "kind": "hint",
+      "levelId": "level-8",
+      "index": 1,
+      "text": "不能站到敌人身上，走到它旁边就停下（差 1 格就能打到）。"
+    },
+    {
+      "key": "level-8-2",
+      "kind": "hint",
+      "levelId": "level-8",
+      "index": 2,
+      "text": "食人魔有 20 点血，英雄一刀砍 10 点，所以要砍两刀。"
+    },
+    {
+      "key": "level-9-0",
+      "kind": "hint",
+      "levelId": "level-9",
+      "index": 0,
+      "text": "敌人.health（比如 敌人.health）是「它还剩下多少血」，会得到一个数字。"
+    },
+    {
+      "key": "level-9-1",
+      "kind": "hint",
+      "levelId": "level-9",
+      "index": 1,
+      "text": "hero.say(敌人.health) 能让英雄把血量报出来，你会看到一个数字。"
+    },
+    {
+      "key": "level-9-2",
+      "kind": "hint",
+      "levelId": "level-9",
+      "index": 2,
+      "text": "英雄一刀砍 10 点。血量掉到 0，它就倒下了。"
+    },
+    {
+      "key": "level-10-0",
+      "kind": "hint",
+      "levelId": "level-10",
+      "index": 0,
+      "text": "宝石和药水不用特意去捡，走过去就自动到手了。"
+    },
+    {
+      "key": "level-10-1",
+      "kind": "hint",
+      "levelId": "level-10",
+      "index": 1,
+      "text": "先找到第一只敌人，打完再重新 findNearestEnemy() 找下一只。"
+    },
+    {
+      "key": "level-10-2",
+      "kind": "hint",
+      "levelId": "level-10",
+      "index": 2,
+      "text": "想看看敌人还剩多少血，用 hero.say(敌人.health) 报出来。"
+    },
+    {
+      "key": "level-10-3",
+      "kind": "hint",
+      "levelId": "level-10",
+      "index": 3,
+      "text": "这条路很长，慢慢写。写完就进入第 2 章啦。"
+    },
+    {
+      "key": "level-11-0",
+      "kind": "hint",
+      "levelId": "level-11",
+      "index": 0,
+      "text": "for (let i = 0; i < 次数; i++) { ... } 里的代码会重复执行「次数」遍。"
+    },
+    {
+      "key": "level-11-1",
+      "kind": "hint",
+      "levelId": "level-11",
+      "index": 1,
+      "text": "数一数要走多少格，把它写进 i < 多少。"
+    },
+    {
+      "key": "level-12-0",
+      "kind": "hint",
+      "levelId": "level-12",
+      "index": 0,
+      "text": "两段次数不一样，就写两个循环。"
+    },
+    {
+      "key": "level-13-0",
+      "kind": "hint",
+      "levelId": "level-13",
+      "index": 0,
+      "text": "宝石是等距摆放的，所以一个循环就能全捡到。"
+    },
+    {
+      "key": "level-14-0",
+      "kind": "hint",
+      "levelId": "level-14",
+      "index": 0,
+      "text": "先用 findNearestEnemy() 把它存进变量，再在循环里反复攻击。"
+    },
+    {
+      "key": "level-14-1",
+      "kind": "hint",
+      "levelId": "level-14",
+      "index": 1,
+      "text": "战斗中它会还手，英雄掉血是正常的。"
+    },
+    {
+      "key": "level-15-0",
+      "kind": "hint",
+      "levelId": "level-15",
+      "index": 0,
+      "text": "循环体里可以写多行代码，它们会整段重复。"
+    },
+    {
+      "key": "level-16-0",
+      "kind": "hint",
+      "levelId": "level-16",
+      "index": 0,
+      "text": "循环变量 i 每一轮都会变化，可以直接拼进字符串。"
+    },
+    {
+      "key": "level-16-1",
+      "kind": "hint",
+      "levelId": "level-16",
+      "index": 1,
+      "text": "字符串拼接用 + ：\"第 \" + i + \" 颗宝石\"。"
+    },
+    {
+      "key": "level-17-0",
+      "kind": "hint",
+      "levelId": "level-17",
+      "index": 0,
+      "text": "两个循环，次数分别写在各自的条件里。"
+    },
+    {
+      "key": "level-18-0",
+      "kind": "hint",
+      "levelId": "level-18",
+      "index": 0,
+      "text": "let 步数 = 13 之后，循环条件里就能写 i < 步数。"
+    },
+    {
+      "key": "level-18-1",
+      "kind": "hint",
+      "levelId": "level-18",
+      "index": 1,
+      "text": "以后想让英雄多走两格，只改数字那一行就行。"
+    },
+    {
+      "key": "level-19-0",
+      "kind": "hint",
+      "levelId": "level-19",
+      "index": 0,
+      "text": "小兽只有 10 点血，一刀就够。"
+    },
+    {
+      "key": "level-20-0",
+      "kind": "hint",
+      "levelId": "level-20",
+      "index": 0,
+      "text": "回想第 1 关你写了多少行——这就是循环的价值。"
+    },
+    {
+      "key": "level-21-0",
+      "kind": "hint",
+      "levelId": "level-21",
+      "index": 0,
+      "text": "循环不只能包移动，也能包攻击。"
+    },
+    {
+      "key": "level-22-0",
+      "kind": "hint",
+      "levelId": "level-22",
+      "index": 0,
+      "text": "把路线拆成「赶路」和「战斗」两种段落，交替写。"
+    },
+    {
+      "key": "level-23-0",
+      "kind": "hint",
+      "levelId": "level-23",
+      "index": 0,
+      "text": "hero.distanceTo(敌人) 会告诉你「离它还有几格」。"
+    },
+    {
+      "key": "level-23-1",
+      "kind": "hint",
+      "levelId": "level-23",
+      "index": 1,
+      "text": "距离是 1，说明它就在旁边；是 3，就是还差 3 格。"
+    },
+    {
+      "key": "level-23-2",
+      "kind": "hint",
+      "levelId": "level-23",
+      "index": 2,
+      "text": "hero.say(hero.distanceTo(敌人)) 能让英雄把距离报出来，你会看到一个数字。"
+    },
+    {
+      "key": "level-23-3",
+      "kind": "hint",
+      "levelId": "level-23",
+      "index": 3,
+      "text": "读完距离，再走到它旁边，打两刀，然后走到出口。"
+    },
+    {
+      "key": "level-24-0",
+      "kind": "hint",
+      "levelId": "level-24",
+      "index": 0,
+      "text": "if 就是「如果」。写法是：if (条件) { 要做的事 }。"
+    },
+    {
+      "key": "level-24-1",
+      "kind": "hint",
+      "levelId": "level-24",
+      "index": 1,
+      "text": "if 后面的大括号里，只在条件说得通的时候才会执行。"
+    },
+    {
+      "key": "level-24-2",
+      "kind": "hint",
+      "levelId": "level-24",
+      "index": 2,
+      "text": "这里的条件是比较大小：hero.distanceTo(敌人) > 1，意思是「离得比 1 格还远」。"
+    },
+    {
+      "key": "level-24-3",
+      "kind": "hint",
+      "levelId": "level-24",
+      "index": 3,
+      "text": "先写条件，再把「要做什么」写进大括号里。"
+    },
+    {
+      "key": "level-25-0",
+      "kind": "hint",
+      "levelId": "level-25",
+      "index": 0,
+      "text": "else 是「不然」。if 和 else 只会做其中一个：if 的事没发生，才做 else 的事。"
+    },
+    {
+      "key": "level-25-1",
+      "kind": "hint",
+      "levelId": "level-25",
+      "index": 1,
+      "text": "读一读：如果够得着（距离不超过 1 格），就打它；不然，就走近一点。"
+    },
+    {
+      "key": "level-25-2",
+      "kind": "hint",
+      "levelId": "level-25",
+      "index": 2,
+      "text": "写完 if 的大括号，紧接着写 else，再写一对大括号。"
+    },
+    {
+      "key": "level-25-3",
+      "kind": "hint",
+      "levelId": "level-25",
+      "index": 3,
+      "text": "这一关不用走到出口：把小兽打倒，就算过关。"
+    },
+    {
+      "key": "level-26-0",
+      "kind": "hint",
+      "levelId": "level-26",
+      "index": 0,
+      "text": "&& 读作「并且」。它把两个条件连起来，两个都说得通，整段才算数。"
+    },
+    {
+      "key": "level-26-1",
+      "kind": "hint",
+      "levelId": "level-26",
+      "index": 1,
+      "text": "敌人 && hero.distanceTo(敌人) <= 1 的意思是：先确认找到了敌人，再看它离得够不够近。"
+    },
+    {
+      "key": "level-26-2",
+      "kind": "hint",
+      "levelId": "level-26",
+      "index": 2,
+      "text": "前面的两小段里，任何一段不成立，后面的就不用算了，程序也不会出错。"
+    },
+    {
+      "key": "level-26-3",
+      "kind": "hint",
+      "levelId": "level-26",
+      "index": 3,
+      "text": "敌人全被打败后，findNearestEnemy() 会给一个空的（null），这时候就安安心心往右走。"
+    },
+    {
+      "key": "level-27-0",
+      "kind": "hint",
+      "levelId": "level-27",
+      "index": 0,
+      "text": "hero.canMoveRight() 会回答「能」或者「不能」：右边是墙、或者站着人，就回答不能。"
+    },
+    {
+      "key": "level-27-1",
+      "kind": "hint",
+      "levelId": "level-27",
+      "index": 1,
+      "text": "不能往右的时候，就用 else 往下走一格。"
+    },
+    {
+      "key": "level-27-2",
+      "kind": "hint",
+      "levelId": "level-27",
+      "index": 2,
+      "text": "这就是自动找路的开始：能右就右，不能就下。"
+    },
+    {
+      "key": "level-28-0",
+      "kind": "hint",
+      "levelId": "level-28",
+      "index": 0,
+      "text": "hero.canMoveDown() 会回答「下面能不能走」。"
+    },
+    {
+      "key": "level-28-1",
+      "kind": "hint",
+      "levelId": "level-28",
+      "index": 1,
+      "text": "往下能走就一直往下，走到最底下一行，它会回答不能。"
+    },
+    {
+      "key": "level-28-2",
+      "kind": "hint",
+      "levelId": "level-28",
+      "index": 2,
+      "text": "这时候再用 else 往右走，一直到出口。"
+    },
+    {
+      "key": "level-29-0",
+      "kind": "hint",
+      "levelId": "level-29",
+      "index": 0,
+      "text": "hero.lookRight() 会告诉你右边那一格有什么，答案是这些词之一：\"空地\"、\"墙\"、\"尖刺\"、\"敌人\"、\"物品\"、\"出口\"。"
+    },
+    {
+      "key": "level-29-1",
+      "kind": "hint",
+      "levelId": "level-29",
+      "index": 1,
+      "text": "hero.lookRight() === \"尖刺\" 就是在问：右边是尖刺吗？"
+    },
+    {
+      "key": "level-29-2",
+      "kind": "hint",
+      "levelId": "level-29",
+      "index": 2,
+      "text": "看到尖刺，就先往下走到安全的一行绕过去。"
+    },
+    {
+      "key": "level-29-3",
+      "kind": "hint",
+      "levelId": "level-29",
+      "index": 3,
+      "text": "绕过去之后，别忘了回来打那只食人魔，再走到出口。"
+    },
+    {
+      "key": "level-30-0",
+      "kind": "hint",
+      "levelId": "level-30",
+      "index": 0,
+      "text": "hero.lookRight() === \"墙\" 表示前面没路了。"
+    },
+    {
+      "key": "level-30-1",
+      "kind": "hint",
+      "levelId": "level-30",
+      "index": 1,
+      "text": "先往下走一格，然后一直向右：撞墙就往上走一格。"
+    },
+    {
+      "key": "level-30-2",
+      "kind": "hint",
+      "levelId": "level-30",
+      "index": 2,
+      "text": "上来之后前面就通了，继续往右就是出口。"
+    },
+    {
+      "key": "level-31-0",
+      "kind": "hint",
+      "levelId": "level-31",
+      "index": 0,
+      "text": "else if 是「不然再看看」。它接着 if 往下问第二种情况。"
+    },
+    {
+      "key": "level-31-1",
+      "kind": "hint",
+      "levelId": "level-31",
+      "index": 1,
+      "text": "顺序很重要：先看是不是尖刺，再看是不是墙，都不是就往前走。"
+    },
+    {
+      "key": "level-31-2",
+      "kind": "hint",
+      "levelId": "level-31",
+      "index": 2,
+      "text": "只要有一个对上了，后面的就不用再看了。"
+    },
+    {
+      "key": "level-32-0",
+      "kind": "hint",
+      "levelId": "level-32",
+      "index": 0,
+      "text": "hero.health 是英雄自己还剩的血，满血是 100。"
+    },
+    {
+      "key": "level-32-1",
+      "kind": "hint",
+      "levelId": "level-32",
+      "index": 1,
+      "text": "受伤以后这个数字会变小。hero.say(hero.health) 能把血量报出来。"
+    },
+    {
+      "key": "level-32-2",
+      "kind": "hint",
+      "levelId": "level-32",
+      "index": 2,
+      "text": "小兽只有 10 点血，英雄一刀就够。"
+    },
+    {
+      "key": "level-33-0",
+      "kind": "hint",
+      "levelId": "level-33",
+      "index": 0,
+      "text": "hero.maxHealth 是血量上限，也就是满血的那个数（100）。"
+    },
+    {
+      "key": "level-33-1",
+      "kind": "hint",
+      "levelId": "level-33",
+      "index": 1,
+      "text": "if (hero.health < hero.maxHealth) 的意思是：比满血少，就是掉过血了。"
+    },
+    {
+      "key": "level-33-2",
+      "kind": "hint",
+      "levelId": "level-33",
+      "index": 2,
+      "text": "掉血了就下去喝药水，再上来继续走。"
+    },
+    {
+      "key": "level-33-3",
+      "kind": "hint",
+      "levelId": "level-33",
+      "index": 3,
+      "text": "路上还有一只食人魔，打两刀就倒下。"
+    },
+    {
+      "key": "level-34-0",
+      "kind": "hint",
+      "levelId": "level-34",
+      "index": 0,
+      "text": "套路就是：够得着就打，够不着就走。"
+    },
+    {
+      "key": "level-34-1",
+      "kind": "hint",
+      "levelId": "level-34",
+      "index": 1,
+      "text": "别忘了前面的 && ：先确认找到了敌人，再看它够不够近。"
+    },
+    {
+      "key": "level-34-2",
+      "kind": "hint",
+      "levelId": "level-34",
+      "index": 2,
+      "text": "打光以后 findNearestEnemy() 会给你一个空的，那时候就安心往右走。"
+    },
+    {
+      "key": "level-35-0",
+      "kind": "hint",
+      "levelId": "level-35",
+      "index": 0,
+      "text": "while (true) { ... } 会一直重复，直到任务完成或英雄倒下。"
+    },
+    {
+      "key": "level-35-1",
+      "kind": "hint",
+      "levelId": "level-35",
+      "index": 1,
+      "text": "不用担心停不下来：踩上出口的那一瞬间程序就结束了。"
+    },
+    {
+      "key": "level-36-0",
+      "kind": "hint",
+      "levelId": "level-36",
+      "index": 0,
+      "text": "hero.pos.x 是英雄现在在第几列，hero.pos.y 是第几行。"
+    },
+    {
+      "key": "level-36-1",
+      "kind": "hint",
+      "levelId": "level-36",
+      "index": 1,
+      "text": "while (hero.pos.x < 10) 表示「还没到第 10 列就继续走」，到了就停下来。"
+    },
+    {
+      "key": "level-36-2",
+      "kind": "hint",
+      "levelId": "level-36",
+      "index": 2,
+      "text": "第二段路同理：还没到第 4 行就继续往下走。"
+    },
+    {
+      "key": "level-37-0",
+      "kind": "hint",
+      "levelId": "level-37",
+      "index": 0,
+      "text": "这就是自动战斗的雏形：一个 while 包住「观察 → 决定 → 行动」。"
+    },
+    {
+      "key": "level-38-0",
+      "kind": "hint",
+      "levelId": "level-38",
+      "index": 0,
+      "text": "findNearestItem() 找不到东西时返回 null，条件不成立，循环就结束了。"
+    },
+    {
+      "key": "level-38-1",
+      "kind": "hint",
+      "levelId": "level-38",
+      "index": 1,
+      "text": "捡完之后还要走到出口。"
+    },
+    {
+      "key": "level-39-0",
+      "kind": "hint",
+      "levelId": "level-39",
+      "index": 0,
+      "text": "while (boss.health > 0) 比写死「打 6 刀」更聪明：换个血量的敌人也不用改代码。"
+    },
+    {
+      "key": "level-40-0",
+      "kind": "hint",
+      "levelId": "level-40",
+      "index": 0,
+      "text": "while (true) 里先判断 canMoveRight()，再判断 canMoveDown()，都不行就 break 结束。"
+    },
+    {
+      "key": "level-40-1",
+      "kind": "hint",
+      "levelId": "level-40",
+      "index": 1,
+      "text": "break 表示跳出循环。"
+    },
+    {
+      "key": "level-41-0",
+      "kind": "hint",
+      "levelId": "level-41",
+      "index": 0,
+      "text": "这次不用数次数，把第 30 关的思路换成 while 就行。"
+    },
+    {
+      "key": "level-42-0",
+      "kind": "hint",
+      "levelId": "level-42",
+      "index": 0,
+      "text": "把「打敌人」放在最优先：距离 1 就先砍，其次才是走路。"
+    },
+    {
+      "key": "level-43-0",
+      "kind": "hint",
+      "levelId": "level-43",
+      "index": 0,
+      "text": "敌人会跟着你走，所以不用追它，站住反击也行。"
+    },
+    {
+      "key": "level-43-1",
+      "kind": "hint",
+      "levelId": "level-43",
+      "index": 1,
+      "text": "走到墙边还有敌人没解决时，用 hero.wait() 原地等它过来。"
+    },
+    {
+      "key": "level-44-0",
+      "kind": "hint",
+      "levelId": "level-44",
+      "index": 0,
+      "text": "判断顺序很重要：能打就打，其次躲尖刺，再其次往前走，最后才考虑上下。"
+    },
+    {
+      "key": "level-45-0",
+      "kind": "hint",
+      "levelId": "level-45",
+      "index": 0,
+      "text": "判断顺序建议：够得着就打 → 前方尖刺就绕 → 能右转就右转 → 能下行就下行。"
+    },
+    {
+      "key": "level-45-1",
+      "kind": "hint",
+      "levelId": "level-45",
+      "index": 1,
+      "text": "这一章开始可以用 function 把常用判断打包起来。"
+    },
+    {
+      "key": "level-46-0",
+      "kind": "hint",
+      "levelId": "level-46",
+      "index": 0,
+      "text": "if (hero.health < 60) 可以当作「该补血了」的信号。"
+    },
+    {
+      "key": "level-46-1",
+      "kind": "hint",
+      "levelId": "level-46",
+      "index": 1,
+      "text": "被围住时先对付最近的敌人，别硬冲。"
+    },
+    {
+      "key": "level-47-0",
+      "kind": "hint",
+      "levelId": "level-47",
+      "index": 0,
+      "text": "有时不得不踩一次尖刺（-5 血），这比绕远路划算。"
+    },
+    {
+      "key": "level-47-1",
+      "kind": "hint",
+      "levelId": "level-47",
+      "index": 1,
+      "text": "判断顺序：打怪 → 尖刺就下 → 能右就右 → 能上就上 → 能下就下。"
+    },
+    {
+      "key": "level-48-0",
+      "kind": "hint",
+      "levelId": "level-48",
+      "index": 0,
+      "text": "迷宫里不需要「向左」：一路右、下、上就能到出口。"
+    },
+    {
+      "key": "level-49-0",
+      "kind": "hint",
+      "levelId": "level-49",
+      "index": 0,
+      "text": "把所有套路串起来：观察、判断、行动，循环到出口为止。"
+    },
+    {
+      "key": "level-49-1",
+      "kind": "hint",
+      "levelId": "level-49",
+      "index": 1,
+      "text": "想想能不能用 function 把「打怪」这一段包起来，代码会更短。"
+    }
+  ]
+}
